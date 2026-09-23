@@ -234,6 +234,19 @@ footer .logo .logo-mark {
   object-fit: contain;
   display: block;
 }
+footer .footer-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 260px;
+}
+footer .footer-brand-desc {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--muted);
+}
 .nav-left {
   display: flex;
   align-items: center;
@@ -410,10 +423,13 @@ footer .logo .logo-mark {
 }
 
 /* ---------- story (pinned scroll sequence) ---------- */
+/* The section and stage intentionally create NO stacking context: the visual
+   content lives inside .story-camera (z-index 101, above the fixed nav) while
+   .story-caption sits at z-index 99 (below the nav) so the nav visually
+   covers the caption when they overlap. */
 .story {
   position: relative;
   height: 600vh;
-  z-index: 101;
   pointer-events: none;
 }
 .story-stage {
@@ -424,8 +440,6 @@ footer .logo .logo-mark {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 101;
-  isolation: isolate;
   pointer-events: none;
 }
 .story-camera > .floating-lines-container {
@@ -436,17 +450,31 @@ footer .logo .logo-mark {
   clip-path: inset(82px 0 0);
 }
 .story-camera {
-  position: absolute;
-  inset: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
   background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1;
+  /* Above the fixed nav (z-index 100) so the whole story visual stays on top
+     of it, exactly as before. */
+  z-index: 101;
   isolation: isolate;
   transform-origin: 50% 18%;
   will-change: transform;
   pointer-events: none;
+}
+/* Desktop only: the camera is a sticky sibling of .story-stage (moved out of
+   it so its z-index 101 resolves against the root context, above the fixed
+   nav, while .story-caption stays inside the stage at z-index 0 -> below the
+   nav). Pull it up one viewport so it overlaps the sticky stage and pins at
+   the exact same scroll position. Mobile (<=767px) is untouched: its own
+   .story-camera override already resets position/inset/height. */
+@media (min-width: 768px) {
+  .story-camera {
+    margin-top: -100vh;
+  }
 }
 .story-black-transition,
 .story-backwhole {
@@ -517,10 +545,12 @@ footer .logo .logo-mark {
   left: 40px;
   top: 50%;
   transform: translateY(-50%);
-  /* Sits below .story-camera (z-index 1) so it stays put while the camera
+  /* Sits below .story-camera (z-index 101) so it stays put while the camera
      zooms (the caption no longer scales with the zoom), and the zoomed-in
-     phone still covers it during the black transition. */
-  z-index: 0;
+     phone still covers it during the black transition. It also sits below
+     the fixed nav (z-index 100) so the nav visually covers the caption when
+     they overlap. */
+  z-index: 99;
   padding-left: 0;
   max-width: 320px;
 }
@@ -1402,12 +1432,125 @@ footer .cols {
   font-size: 13.5px;
   color: var(--muted);
 }
+footer .cols-title {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--fg);
+  letter-spacing: 0.04em;
+}
 footer .cols a {
   display: block;
   margin-bottom: 8px;
 }
 footer .cols a:hover {
   color: var(--fg);
+}
+footer .socials {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 4px;
+}
+footer .social {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  transition: color var(--dur-s) var(--ease), border-color var(--dur-s) var(--ease), background var(--dur-s) var(--ease);
+}
+footer .social:hover {
+  color: var(--fg);
+  border-color: var(--purple);
+}
+footer .social .social-icon {
+  flex: none;
+}
+footer .social-soon {
+  cursor: default;
+  opacity: 0.7;
+}
+footer .social-soon:hover {
+  color: var(--muted);
+  border-color: var(--border);
+}
+footer .social[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  font-size: 11px;
+  line-height: 1.4;
+  padding: 6px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+}
+footer .social[data-tooltip]:hover::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background: var(--bg-soft);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  pointer-events: none;
+  z-index: 10;
+}
+.footer-ai {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 26px;
+  margin-bottom: 26px;
+  border-bottom: 1px solid var(--border);
+}
+.footer-ai-text {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+  text-align: center;
+}
+.footer-ai-models {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+.btn-ai {
+  background: var(--purple);
+  color: var(--fg);
+  border-color: transparent;
+  transition: background var(--dur-s) var(--ease), color var(--dur-s) var(--ease), transform var(--dur-s) var(--ease);
+}
+.btn-ai:hover {
+  background: var(--purple-light);
+  color: var(--bg);
+  transform: translateY(-1px);
+}
+.btn-ai .ai-icon {
+  flex: none;
+}
+@media (max-width: 767px) {
+  .footer-ai {
+    gap: 14px;
+  }
+  .footer-ai-models {
+    gap: 10px;
+  }
 }
 
 /* ---------- whatsapp float ---------- */
@@ -1568,7 +1711,9 @@ footer .cols a:hover {
     max-width: none;
     text-align: center;
     padding: 0 24px;
-    z-index: 3;
+    /* Static in the flow, so this is informational: it keeps the caption in
+       the same sub-nav layer (99) as the desktop caption. */
+    z-index: 99;
   }
   .story-caption .eyebrow {
     justify-content: center;

@@ -88,7 +88,8 @@ export default function Story() {
             {t("story.headline1")}
           </h2>
         </div>
-        <div className="story-camera" ref={cameraRef}>
+      </div>
+      <div className="story-camera" ref={cameraRef}>
           <div className="story-black-transition" ref={blackTransitionRef} />
           <div
             className="story-backwhole"
@@ -365,7 +366,6 @@ export default function Story() {
           />
         </div>
         </div>
-      </div>
       </div>
     </section>
   );

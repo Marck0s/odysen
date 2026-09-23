@@ -435,10 +435,23 @@ export function useWhatsappStory({
     };
 
     build();
+    // Track the current layout branch so resize handling can tell real layout
+    // changes (mobile <-> desktop) apart from spurious mobile resize events.
+    let lastIsMobile = window.matchMedia("(max-width: 767px)").matches;
 
     const onResize = () => {
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(build);
+      raf = requestAnimationFrame(() => {
+        const isMobile = window.matchMedia("(max-width: 767px)").matches;
+        // On physical phones, touch/scroll interactions collapse or expand the
+        // browser chrome (URL bar), which fires `resize` events. Rebuilding on
+        // those would kill and recreate the mobile loop timeline, restarting
+        // the conversation. The mobile loop reads live measurements, so it
+        // only needs a rebuild when the layout branch actually changes.
+        if (isMobile && isMobile === lastIsMobile) return;
+        lastIsMobile = isMobile;
+        build();
+      });
     };
     window.addEventListener("resize", onResize);
 
