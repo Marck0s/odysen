@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useTextReveal } from "@/hooks/useTextReveal";
-import { CASE_STUDIES } from "@/lib/data/content";
+import { CASE_STUDIES, PROJECTS } from "@/lib/data/content";
 
 export default function Portfolio() {
   const { t } = useLanguage();
@@ -23,6 +23,19 @@ export default function Portfolio() {
         >
           {t("work.title")}
         </h2>
+        <div className="project-grid">
+          {PROJECTS.map((p) => (
+            <article className="project-card" key={p.id}>
+              <h3 className="project-name">{p.name}</h3>
+              <div className="project-image">
+                <img src={p.image} alt={p.name} loading="lazy" width={1920} height={960} />
+              </div>
+              <a className="project-cta" href={p.url} target="_blank" rel="noopener noreferrer">
+                {t("work.cta")} <span aria-hidden="true">→</span>
+              </a>
+            </article>
+          ))}
+        </div>
         <div className="case-list">
           {CASE_STUDIES.map((c) => (
             <div className="case-row" key={c.number}>

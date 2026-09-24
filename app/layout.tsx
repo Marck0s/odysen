@@ -20,12 +20,12 @@ export const metadata: Metadata = {
   title: "Odysen — Criação, automação e crescimento digital",
   description:
     "A Odysen constrói, automatiza e eleva negócios digitais através de websites, chatbots inteligentes, tráfego pago e marketing.",
-  icons: { icon: "/assets/odysen-logo.png" },
+  icons: { icon: "/assets/odysen-logo/odysen-logo.png" },
   openGraph: {
     title: "Odysen — Digital creation. Intelligent automation. Business growth.",
     description: "A Odysen constrói, automatiza e eleva negócios digitais.",
     type: "website",
-    images: ["/assets/odysen-logo.png"],
+    images: ["/assets/odysen-logo/odysen-logo.png"],
   },
   twitter: {
     card: "summary_large_image",

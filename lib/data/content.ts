@@ -11,6 +11,29 @@ export const CASE_STUDIES: CaseStudy[] = [
   { number: "04", name: "Nortek Distribuidora", tag: "Websites & Chatbot" },
 ];
 
+export interface Project {
+  id: string;
+  name: string;
+  image: string;
+  url: string;
+}
+
+export const PROJECTS: Project[] = [
+  {
+    id: "nutri-fernanda",
+    name: "Nutri Fernanda",
+    image: "/assets/projects-work/nutri-fernanda.webp",
+    // TODO: substituir pelo link real do deploy quando estiver no ar.
+    url: "https://nutriferranda.com.br",
+  },
+  {
+    id: "serralheria-kaiser",
+    name: "Serralheria Kaiser",
+    image: "/assets/projects-work/serralheria-kaiser.webp",
+    url: "https://serralheriakaiser.com.br/",
+  },
+];
+
 export interface Testimonial {
   initials: string;
   quote: string;

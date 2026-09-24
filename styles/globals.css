@@ -372,7 +372,10 @@ footer .footer-brand-desc {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 140px 0 60px;
+  /* Keep the horizontal padding from .container (28px) — only override the
+     vertical rhythm here, matching the pattern of the other sections. */
+  padding-top: 140px;
+  padding-bottom: 60px;
   z-index: 1;
 }
 .hero h1 {
@@ -703,6 +706,10 @@ footer .footer-brand-desc {
 .statusbar-icons svg {
   width: 19px;
   height: 25px;
+}
+.statusbar-icons .statusbar-battery {
+  width: 24px;
+  height: 24px;
 }
 .phone-topbar {
   padding: 30px 18px 12px;
@@ -1351,6 +1358,55 @@ footer .footer-brand-desc {
   justify-content: flex-end;
 }
 
+/* ---------- portfolio: project cards ---------- */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+  margin-bottom: 70px;
+}
+.project-card {
+  display: flex;
+  flex-direction: column;
+}
+.project-name {
+  font-size: 20px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.project-image {
+  aspect-ratio: 2 / 1;
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+}
+.project-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-m) var(--ease);
+}
+.project-card:hover .project-image img {
+  transform: scale(1.03);
+}
+.project-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--purple-light);
+  transition: color var(--dur-s) var(--ease), gap var(--dur-s) var(--ease);
+}
+.project-cta:hover {
+  color: var(--fg);
+  gap: 12px;
+}
+
 /* ---------- process ---------- */
 .process {
   padding: 150px 0;
@@ -1694,6 +1750,25 @@ footer .social[data-tooltip]:hover::before {
     align-items: flex-start;
     gap: 20px;
   }
+  /* Tablet phone: the typing bar gets a bit more presence so it doesn't look
+     tiny against the smaller device (the ≤767px block below overrides this
+     with an even bigger bar for real phones). */
+  .phone-inputbar {
+    gap: 7px;
+    padding: 9px 12px 8px;
+  }
+  .inputbar-btn {
+    width: 28px;
+    height: 28px;
+  }
+  .inputbar-field {
+    height: 38px;
+    border-radius: 19px;
+    padding: 0 12px;
+  }
+  .inputbar-caret {
+    height: 17px;
+  }
   .service-head {
     grid-template-columns: 1fr;
   }
@@ -1755,6 +1830,10 @@ footer .social[data-tooltip]:hover::before {
     width: 16px;
     height: 16px;
   }
+  .statusbar-icons .statusbar-battery {
+    width: 20px;
+    height: 20px;
+  }
   .phone-topbar {
     padding: 0 14px 10px;
   }
@@ -1775,6 +1854,11 @@ footer .social[data-tooltip]:hover::before {
      the normal flow with the full conversation visible; as you scroll through
      the section a light scrub dissolves the device while the odysen-banners
      cards fade in below it (see useWhatsappStory). */
+  .project-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    margin-bottom: 60px;
+  }
   .story {
     height: auto;
   }
@@ -1894,6 +1978,10 @@ footer .social[data-tooltip]:hover::before {
   .statusbar-icons svg {
     width: 12px;
     height: 12px;
+  }
+  .statusbar-icons .statusbar-battery {
+    width: 15px;
+    height: 15px;
   }
   .phone-topbar {
     padding: 14px 10px 7px;
@@ -2034,20 +2122,20 @@ footer .social[data-tooltip]:hover::before {
     line-height: 1.35;
   }
   .phone-inputbar {
-    gap: 6px;
-    padding: 7px 10px 6px;
+    gap: 4px;
+    padding: 9px 8px 8px;
   }
   .inputbar-btn {
     width: 22px;
     height: 22px;
   }
   .inputbar-field {
-    height: 28px;
-    border-radius: 14px;
-    padding: 0 10px;
+    height: 34px;
+    border-radius: 17px;
+    padding: 0 12px;
   }
   .inputbar-caret {
-    height: 12px;
+    height: 15px;
   }
   .phone-homebar {
     padding: 4px 0 7px;

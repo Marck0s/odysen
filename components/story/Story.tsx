@@ -165,6 +165,7 @@ export default function Story() {
                       <line x1="12" y1="20" x2="12.01" y2="20" />
                     </svg>
                     <svg
+                      className="statusbar-battery"
                       viewBox="0 0 24 24"
                       width="16"
                       height="16"
@@ -175,9 +176,9 @@ export default function Story() {
                       strokeLinejoin="round"
                       aria-hidden="true"
                     >
-                      <rect x="1" y="7" width="17" height="10" rx="2" />
-                      <path d="M22 11v2" />
-                      <rect x="3" y="9" width="11" height="6" rx="1" fill="currentColor" stroke="none" />
+                      <rect x="1" y="6" width="19" height="12" rx="2.5" />
+                      <path d="M22 10.5v3" />
+                      <rect x="3.5" y="8.5" width="13" height="7" rx="1.5" fill="currentColor" stroke="none" />
                     </svg>
                   </div>
                 </div>
@@ -274,8 +275,8 @@ export default function Story() {
                   <button className="inputbar-btn" type="button" aria-label={t("story.aria.attach")}>
                     <svg
                       viewBox="0 0 24 24"
-                      width="18"
-                      height="18"
+                      width="16"
+                      height="16"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2"
@@ -291,8 +292,8 @@ export default function Story() {
                   <button className="inputbar-btn" type="button" aria-label={t("story.aria.camera")}>
                     <svg
                       viewBox="0 0 24 24"
-                      width="18"
-                      height="18"
+                      width="16"
+                      height="16"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2"
@@ -307,8 +308,8 @@ export default function Story() {
                   <button className="inputbar-btn" type="button" aria-label={t("story.aria.mic")}>
                     <svg
                       viewBox="0 0 24 24"
-                      width="18"
-                      height="18"
+                      width="16"
+                      height="16"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2"
