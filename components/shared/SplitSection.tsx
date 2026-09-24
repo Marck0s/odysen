@@ -16,15 +16,17 @@ export default function SplitSection({ id, statementHtml, eyebrow, children }: S
 
   return (
     <section className="split" id={id}>
-      <div className="statement">
-        <p ref={statementRef} dangerouslySetInnerHTML={{ __html: statementHtml }} />
-      </div>
-      <div className="body">
-        <div className="eyebrow">
-          <span className="dot" />
-          <span>{eyebrow}</span>
+      <div className="container split-grid">
+        <div className="statement">
+          <p ref={statementRef} dangerouslySetInnerHTML={{ __html: statementHtml }} />
         </div>
-        {children}
+        <div className="body">
+          <div className="eyebrow">
+            <span className="dot" />
+            <span>{eyebrow}</span>
+          </div>
+          {children}
+        </div>
       </div>
     </section>
   );

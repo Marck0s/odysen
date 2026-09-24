@@ -15,7 +15,8 @@ export default function LangToggle() {
         aria-pressed={locale === "pt-BR"}
         onClick={() => setLocale("pt-BR")}
       >
-        <img src="/assets/lang-flags/pt-lang.png" alt="Bandeira do Brasil" />
+        <span className="lang-dot" aria-hidden="true" />
+        <span className="lang-label">PT</span>
       </button>
       <button
         type="button"
@@ -24,11 +25,9 @@ export default function LangToggle() {
         aria-pressed={isEn}
         onClick={() => setLocale("en-US")}
       >
-        <img src="/assets/lang-flags/en-lang.png" alt="United States flag" />
+        <span className="lang-dot" aria-hidden="true" />
+        <span className="lang-label">EN</span>
       </button>
-      <span className="lang-thumb" aria-hidden="true">
-        <img src={isEn ? "/assets/lang-flags/en-lang.png" : "/assets/lang-flags/pt-lang.png"} alt="" />
-      </span>
     </div>
   );
 }

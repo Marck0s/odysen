@@ -12,7 +12,6 @@ import About from "@/components/about/About";
 import Ambition from "@/components/about/Ambition";
 import Portfolio from "@/components/portfolio/Portfolio";
 import Process from "@/components/process/Process";
-import Testimonials from "@/components/testimonials/Testimonials";
 import Faq from "@/components/faq/Faq";
 import FinalCta from "@/components/cta/FinalCta";
 import Footer from "@/components/footer/Footer";
@@ -46,7 +45,6 @@ export default function HomeExperience() {
         <Ambition />
         <Portfolio />
         <Process />
-        <Testimonials />
         <Faq />
         <FinalCta />
       </main>

@@ -91,6 +91,11 @@ img {
     animation-duration: 0.001ms !important;
     transition-duration: 0.001ms !important;
   }
+  /* Park the sheen sweep off-screen and keep only the static glare. */
+  .cell-screen::after {
+    animation: none !important;
+    transform: translateX(400%) skewX(-18deg) !important;
+  }
 }
 
 /* ---------- atmosphere ---------- */
@@ -137,7 +142,7 @@ img {
   opacity: 0;
   transform: scale(0.94);
 }
-#loader .loader-video {
+#loader .loader-logo {
   width: min(46vw, 400px);
   height: auto;
   display: block;
@@ -267,8 +272,9 @@ footer .footer-brand-desc {
   height: 2.2em;
   padding: 0.3em;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
   flex: none;
 }
 .lang-toggle > button {
@@ -283,48 +289,38 @@ footer .footer-brand-desc {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.3em;
   cursor: pointer;
 }
-.lang-toggle .lang-button img {
-  width: calc(100% - 0.05em);
-  height: calc(100% - 0.05em);
-  border-radius: 999px;
-  object-fit: cover;
-  opacity: 0.5;
+/* System-switch indicator: a purple dot with a subtle glow marks the active
+   language. The dot crossfades between the two sides while the labels stay
+   muted until active — an OS-like segmented control. */
+.lang-toggle .lang-dot {
+  width: 0.42em;
+  height: 0.42em;
+  border-radius: 50%;
+  background: var(--purple);
+  box-shadow: 0 0 0.6em rgba(114, 56, 240, 0.4), 0 0 0.15em rgba(114, 56, 240, 0.55);
+  opacity: 0;
+  transform: scale(0.4);
   transition: opacity var(--dur-s) var(--ease), transform var(--dur-s) var(--ease);
 }
-.lang-toggle > button.is-active img {
+.lang-toggle .lang-label {
+  font-size: 0.72em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  transition: color var(--dur-s) var(--ease);
+}
+.lang-toggle > button.is-active .lang-dot {
   opacity: 1;
+  transform: scale(1);
 }
-.lang-toggle > button:hover img {
-  opacity: 0.95;
+.lang-toggle > button.is-active .lang-label {
+  color: var(--fg);
 }
-.lang-toggle .lang-thumb {
-  position: absolute;
-  top: 0.3em;
-  bottom: 0.3em;
-  left: 0.3em;
-  width: calc(50% - 0.3em);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
-  z-index: 1;
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  transition: transform var(--dur-m) var(--ease), background var(--dur-m) var(--ease), border-color var(--dur-m) var(--ease);
-}
-.lang-toggle .lang-thumb img {
-  width: 100%;
-  height: 100%;
-  border-radius: 999px;
-  object-fit: cover;
-}
-.lang-toggle.is-en .lang-thumb {
-  transform: translateX(100%);
+.lang-toggle > button:hover .lang-label {
+  color: var(--fg);
 }
 .mobile-menu .lang-toggle {
   font-size: 13px;
@@ -483,7 +479,7 @@ footer .footer-brand-desc {
 }
 .story-black-transition {
   z-index: 6;
-  background: #000;
+  background: var(--bg);
   opacity: 0;
   will-change: top, left, width, height, border-radius, opacity;
 }
@@ -582,6 +578,21 @@ footer .footer-brand-desc {
   filter: blur(50px);
   pointer-events: none;
 }
+/* Cast shadow behind the phone: a dark blurred silhouette slightly larger
+   than the device and offset downward, so the phone reads as floating above
+   the dark background (3D depth). Paints above the purple glow (::before)
+   but behind the device itself. */
+.story-visual-box::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 26px;
+  background: rgba(0, 0, 0, 0.8);
+  filter: blur(38px);
+  transform: translateY(6%) scale(1.04);
+  pointer-events: none;
+}
 .odysen-cell-interaction {
   position: relative;
   width: 100%;
@@ -599,6 +610,53 @@ footer .footer-brand-desc {
   background: linear-gradient(180deg, #0f0a1a, #050308);
   display: flex;
   flex-direction: column;
+}
+/* Glass glare: a subtle diagonal light reflection across the screen glass,
+   plus a slow sheen sweep that drifts across every few seconds. Both sit
+   above the chat content but below the phone mold (z-index 4). */
+.cell-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0) 32%,
+    rgba(255, 255, 255, 0.03) 44%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.03) 56%,
+    rgba(255, 255, 255, 0) 68%
+  );
+}
+.cell-screen::after {
+  content: "";
+  position: absolute;
+  top: -25%;
+  bottom: -25%;
+  left: -45%;
+  width: 40%;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0)
+  );
+  transform: skewX(-18deg);
+  animation: glass-sweep 9s ease-in-out infinite;
+}
+@keyframes glass-sweep {
+  0% {
+    transform: translateX(0) skewX(-18deg);
+  }
+  55% {
+    transform: translateX(400%) skewX(-18deg);
+  }
+  100% {
+    transform: translateX(400%) skewX(-18deg);
+  }
 }
 .cell-mold {
   position: absolute;
@@ -710,8 +768,34 @@ footer .footer-brand-desc {
   stroke-linejoin: round;
 }
 .phone-topbar .status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 10.5px;
   color: #6de08a;
+}
+/* Online status pulse: a small green dot with a soft expanding ring,
+   like WhatsApp's live presence indicator. */
+.phone-topbar .status::before {
+  content: "";
+  --pulse-ring: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #6de08a;
+  flex: none;
+  animation: status-pulse 2.4s ease-out infinite;
+}
+@keyframes status-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(109, 224, 138, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 var(--pulse-ring) rgba(109, 224, 138, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(109, 224, 138, 0);
+  }
 }
 .phone-body {
   position: relative;
@@ -1127,6 +1211,8 @@ footer .footer-brand-desc {
   z-index: 1;
   padding: 150px 0;
   border-top: 1px solid var(--border);
+}
+.split-grid {
   display: grid;
   grid-template-columns: 0.9fr 1.3fr;
   gap: 70px;
@@ -1485,8 +1571,8 @@ footer .social[data-tooltip]:hover::after {
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg-soft);
-  border: 1px solid var(--border);
-  color: var(--fg);
+  border: 1px solid var(--purple);
+  color: var(--purple-light);
   font-size: 11px;
   line-height: 1.4;
   padding: 6px 10px;
@@ -1504,8 +1590,8 @@ footer .social[data-tooltip]:hover::before {
   width: 8px;
   height: 8px;
   background: var(--bg-soft);
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--purple);
+  border-bottom: 1px solid var(--purple);
   pointer-events: none;
   z-index: 10;
 }
@@ -1617,7 +1703,7 @@ footer .social[data-tooltip]:hover::before {
   .plans {
     grid-template-columns: 1fr;
   }
-  .split {
+  .split-grid {
     grid-template-columns: 1fr;
     gap: 40px;
   }
@@ -1736,6 +1822,10 @@ footer .social[data-tooltip]:hover::before {
   .story-visual-box {
     height: min(62vh, 430px);
   }
+  .story-visual-box::after {
+    filter: blur(22px);
+    transform: translateY(5%) scale(1.05);
+  }
   .story-dolly-gallery {
     display: none;
   }
@@ -1818,6 +1908,12 @@ footer .social[data-tooltip]:hover::before {
   }
   .phone-topbar .status {
     font-size: 9px;
+    gap: 4px;
+  }
+  .phone-topbar .status::before {
+    --pulse-ring: 4px;
+    width: 5px;
+    height: 5px;
   }
   .phone-topbar-actions {
     gap: 4px;

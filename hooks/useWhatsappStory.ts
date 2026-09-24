@@ -339,29 +339,69 @@ export function useWhatsappStory({
           },
         },
       });
+      // The box scale is driven here (not by a timeline tween) so the dive can
+      // be asymmetric without snapping: forward it follows the exact power3.in
+      // curve; backward it un-zooms faster (scaled) so the phone is at a low
+      // scale when the black opens — no giant phone/inputbar revealed through
+      // the fading black. The timeline's own onUpdate fires on every render
+      // (unlike ScrollTrigger's onUpdate, which only fires when the raw scroll
+      // progress changes), so the scale stays locked to the timeline time in
+      // both directions. `recovering` eases back to the exact curve when the
+      // user scrolls forward again right after a backward pass (no snap).
+      let lastTime = 0;
+      let displayScale = 1;
+      let recovering = false;
+      t.eventCallback("onUpdate", () => {
+        const now = t.time();
+        const goingBack = now < lastTime;
+        lastTime = now;
+        const diveProgress = gsap.utils.clamp(0, 1, (now - 0.95) / 0.18);
+        const diveScale = now >= 0.95 ? 1 + 17 * Math.pow(diveProgress, 3) : 1;
+
+        if (goingBack) {
+          recovering = true;
+          // Un-zoom to near-natural scale fast (behind the opaque black), so
+          // when the black opens the phone is at ~1x — never a giant box.
+          const target = 1 + (diveScale - 1) * 0.02;
+          displayScale += (target - displayScale) * 0.5;
+          gsap.set(box, { scale: displayScale });
+        } else {
+          if (recovering && Math.abs(diveScale - displayScale) > 0.5) {
+            displayScale += (diveScale - displayScale) * 0.4;
+          } else {
+            recovering = false;
+            displayScale = diveScale;
+          }
+          gsap.set(box, { scale: displayScale });
+        }
+      });
       master = t;
 
       if (storyFx) {
         t.to(storyFx, { opacity: 1, duration: 0.38, ease: "power2.out" }, 0.1);
       }
 
-      t.to(camera, { scale: 1.42, y: 28, duration: 0.1, ease: "power2.out" }, 0.08)
-        .to(camera, { scale: 1.42, y: 28, duration: 0.08 }, 0.18)
-        .to(camera, { scale: 1.42, y: -12, duration: 0.7, ease: "none" }, 0.2)
-          .set(box, { zIndex: 8, transformOrigin: `${originX}% ${originY}%` }, 0.9)
+      // Multi-phase camera choreography: the camera "reads" the conversation.
+      // Phase 1 (0.00–0.18): wide settle — the phone is fully visible, gentle push.
+      // Phase 2 (0.18–0.45): push toward the first message at the top of the chat.
+      // Phase 3 (0.45–0.90): dolly tracking — the zoom tightens as the
+      //   conversation descends toward the inputbar (the climax).
+      // Phase 4 (0.95+): dive into the inputbar, then pull back to the gallery.
+      t.to(camera, { scale: 1.06, y: 6, duration: 0.18, ease: "power2.out" }, 0.0)
+        .to(camera, { scale: 1.32, y: 14, duration: 0.27, ease: "power2.inOut" }, 0.18)
+        .to(camera, { scale: 1.52, y: 22, duration: 0.45, ease: "none" }, 0.45)
+        .set(box, { zIndex: 8, transformOrigin: `${originX}% ${originY}%` }, 0.95)
         .to(inputbar, {
-          backgroundColor: "#000000",
+          backgroundColor: "#07060b",
           borderColor: "rgba(0, 0, 0, 0)",
           borderRadius: "0px",
           scale: 2.7,
           duration: 0.18,
-          ease: "power2.in",
-        }, 0.9)
-        .to(box, {
-          scale: 18,
-          duration: 0.18,
-          ease: "power2.in",
-        }, 0.9)
+          ease: "power3.in",
+        }, 0.95)
+        // The black closes in as the dive completes, so the screen is fully
+        // dark before the camera pull-back and box reset — the phone can
+        // never reappear.
         .to(blackTransition, {
           opacity: 1,
           top: "0%",
@@ -369,18 +409,38 @@ export function useWhatsappStory({
           width: "100%",
           height: "100%",
           borderRadius: "0px",
+          boxShadow: "0 0 90px 30px rgba(114, 56, 240, 0.45)",
           duration: 0.2,
-          ease: "power2.in",
-        }, 0.92)
-        .to(camera, { scale: 1, y: 0, duration: 0.2, ease: "power2.out" }, 0.92)
-        .set(box, { zIndex: 2, scale: 1 }, 1.12)
-        .to(backwhole, { opacity: 1, scale: 1, duration: 0.22, ease: "power2.out" }, 1.12);
+          ease: "power3.in",
+        }, 0.95)
+        // Camera pulls back behind the opaque black (ends at 1.17), THEN the
+        // box is hidden/reset and the gallery fades in at camera scale 1 — so
+        // the cards never appear zoomed.
+        .to(camera, { scale: 1, y: 0, duration: 0.2, ease: "power2.out" }, 0.97)
+        .set(box, { opacity: 0, zIndex: 2 }, 1.17)
+        .to(backwhole, { opacity: 1, scale: 1, duration: 0.22, ease: "power2.out" }, 1.17)
+        // Fade the gallery with the backwhole (scrubbed together) so the cards
+        // never pop on/off or float over the scene while scrolling back.
+        .to(gallery, { autoAlpha: 1, duration: 0.22, ease: "power2.out" }, 1.17);
+
+      // Human-like typing: variable speed with a short pause after punctuation.
+      const typeSchedule = (el: HTMLDivElement, text: string, startAt: number) => {
+        const calls: Array<[number, () => void]> = [];
+        let at = startAt;
+        for (let k = 0; k < text.length; k++) {
+          const ch = text[k];
+          calls.push([at, growText(el, text.slice(0, k + 1))]);
+          at += 0.004 + (k % 3) * 0.0015;
+          if (ch === "." || ch === "!" || ch === "?") at += 0.1;
+        }
+        return { calls, end: at };
+      };
 
       const bubblePositions: Array<[number, string]> = [
         [0.02, "type"],
         [0.12, "reveal"],
-        [0.62, "type"],
-        [1.14, "reveal"],
+        [0.55, "type"],
+        [0.85, "reveal"],
       ];
       let outgoingTimeIndex = 0;
 
@@ -388,25 +448,43 @@ export function useWhatsappStory({
         const el = els[i];
         if (!el) return;
         if (mode === "type") {
-          const chars = bubbles[i].text.split("");
-          chars.forEach((_, k) => {
-            t.call(growText(el, bubbles[i].text.slice(0, k + 1)), [], pos + k * 0.007);
-          });
-          t.to(el, { opacity: 1, y: 0, scale: 1, duration: 0.26 }, pos + 0.04);
+          const { calls, end } = typeSchedule(el, bubbles[i].text, pos);
+          calls.forEach(([at, fn]) => t.call(fn, [], at));
+          // Springy entrance: overshoot on scale, then settle.
+          t.fromTo(
+            el,
+            { opacity: 0, y: 10, scale: 0.9 },
+            { opacity: 1, y: 0, scale: 1.06, duration: 0.2, ease: "power2.out" },
+            pos + 0.04,
+          );
+          t.to(el, { scale: 1, duration: 0.14, ease: "power1.out" }, pos + 0.24);
           const timeEl = timeEls[outgoingTimeIndex++];
           if (timeEl) {
-            t.to(timeEl, { opacity: 1, duration: 0.12 }, pos + chars.length * 0.007 + 0.06);
+            t.to(timeEl, { opacity: 1, duration: 0.12 }, end + 0.06);
           }
         } else {
           t.call(setText(i), [], pos);
-          t.to(el, { opacity: 1, y: 0, scale: 1, duration: 0.22 }, pos + 0.03);
+          t.fromTo(
+            el,
+            { opacity: 0, y: 10, scale: 0.9 },
+            { opacity: 1, y: 0, scale: 1.06, duration: 0.18, ease: "power2.out" },
+            pos + 0.03,
+          );
+          t.to(el, { scale: 1, duration: 0.12, ease: "power1.out" }, pos + 0.21);
         }
       });
 
-      // Product cards arrive one by one, pushing the view down.
+      // Product cards arrive one by one with a springy entrance, pushing the
+      // view down.
       const cardPositions = [0.22, 0.32, 0.42, 0.52];
       cardEls.forEach((el, i) => {
-        t.to(el, { opacity: 1, y: 0, scale: 1, duration: 0.24 }, cardPositions[i] + 0.03);
+        t.fromTo(
+          el,
+          { opacity: 0, y: 12, scale: 0.92 },
+          { opacity: 1, y: 0, scale: 1.04, duration: 0.22, ease: "power2.out" },
+          cardPositions[i] + 0.03,
+        );
+        t.to(el, { scale: 1, duration: 0.12, ease: "power1.out" }, cardPositions[i] + 0.25);
       });
 
       // The hero's atmospheric glow drifts with the scroll (see AtmosphereBackground),

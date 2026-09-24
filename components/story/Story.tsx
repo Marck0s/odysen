@@ -13,21 +13,8 @@ import {
 
 /**
  * The scripted WhatsApp exchange is authored content for the Odysen brand
- * story and is intentionally kept in Portuguese regardless of the site's
- * language toggle — same as a real customer conversation would be.
+ * story and follows the site's language toggle (pt-BR / en-US).
  */
-const CUSTOMER_MSG_1 = "Quero saber mais.";
-const ODYSEN_REPLY =
-  "Olá, somos da Odysen, uma empresa especialista em digitalizar negócios. Como podemos ajudar?";
-const PRODUCTS = [
-  { name: "Websites", desc: "Criação de sites profissionais." },
-  { name: "Chatbot", desc: "Atendimento inteligente e automatizado." },
-  { name: "Tráfego pago", desc: "Esteja em alta no mercado." },
-  { name: "Marketing", desc: "Eleve o nível visual do seu negócio." },
-];
-const CUSTOMER_MSG_2 = "Quero um pacote customizado com todos os serviços";
-const ODYSEN_REPLY_2 = "Claro!";
-
 export default function Story() {
   const { t } = useLanguage();
 
@@ -51,6 +38,17 @@ export default function Story() {
   const p2 = useRef<HTMLDivElement>(null);
   const p3 = useRef<HTMLDivElement>(null);
   const p4 = useRef<HTMLDivElement>(null);
+
+  const CUSTOMER_MSG_1 = t("story.chat.msg1");
+  const ODYSEN_REPLY = t("story.chat.reply1");
+  const PRODUCTS = [
+    { name: t("story.products.websites.name"), desc: t("story.products.websites.desc") },
+    { name: t("story.products.chatbot.name"), desc: t("story.products.chatbot.desc") },
+    { name: t("story.products.ads.name"), desc: t("story.products.ads.desc") },
+    { name: t("story.products.marketing.name"), desc: t("story.products.marketing.desc") },
+  ];
+  const CUSTOMER_MSG_2 = t("story.chat.msg2");
+  const ODYSEN_REPLY_2 = t("story.chat.reply2");
 
   const bubbles: BubbleConfig[] = [
     { ref: b1, text: CUSTOMER_MSG_1, mode: "type" },
@@ -192,12 +190,12 @@ export default function Story() {
                     <div className="status">online</div>
                   </div>
                   <div className="phone-topbar-actions">
-                    <button type="button" aria-label="Chamada de vídeo">
+                    <button type="button" aria-label={t("story.aria.videoCall")}>
                       <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M15 8.5v-1A2.5 2.5 0 0 0 12.5 5h-7A2.5 2.5 0 0 0 3 7.5v9A2.5 2.5 0 0 0 5.5 19h7a2.5 2.5 0 0 0 2.5-2.5v-1l5 3V5.5l-5 3Z" />
                       </svg>
                     </button>
-                    <button type="button" aria-label="Chamada de voz">
+                    <button type="button" aria-label={t("story.aria.voiceCall")}>
                       <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M7.2 4.5 9.4 4a1.5 1.5 0 0 1 1.7.9l1.1 2.7a1.5 1.5 0 0 1-.4 1.7l-1.3 1.1a12.2 12.2 0 0 0 4.1 4.1l1.1-1.3a1.5 1.5 0 0 1 1.7-.4l2.7 1.1a1.5 1.5 0 0 1 .9 1.7l-.5 2.2a1.8 1.8 0 0 1-1.8 1.4C11.1 19.2 4.8 12.9 4.8 5.4A1.8 1.8 0 0 1 6.2 3.6Z" />
                       </svg>
@@ -211,7 +209,7 @@ export default function Story() {
                     </div>
                   </div>
                   <div className="chat-list" ref={chatListRef} aria-hidden="true">
-                    <div className="chat-date">Hoje</div>
+                    <div className="chat-date">{t("story.chat.date")}</div>
                     <div className="chat-row out">
                       <div className="bubble out" ref={b1} />
                       <span className="bubble-time">13:42</span>
@@ -273,7 +271,7 @@ export default function Story() {
                   </div>
                 </div>
                 <div className="phone-inputbar">
-                  <button className="inputbar-btn" type="button" aria-label="Anexar arquivo">
+                  <button className="inputbar-btn" type="button" aria-label={t("story.aria.attach")}>
                     <svg
                       viewBox="0 0 24 24"
                       width="18"
@@ -290,7 +288,7 @@ export default function Story() {
                   <div className="inputbar-field" ref={inputbarRef}>
                     <span className="inputbar-caret" />
                   </div>
-                  <button className="inputbar-btn" type="button" aria-label="Câmera">
+                  <button className="inputbar-btn" type="button" aria-label={t("story.aria.camera")}>
                     <svg
                       viewBox="0 0 24 24"
                       width="18"
@@ -306,7 +304,7 @@ export default function Story() {
                       <circle cx="12" cy="13" r="4" />
                     </svg>
                   </button>
-                  <button className="inputbar-btn" type="button" aria-label="Microfone">
+                  <button className="inputbar-btn" type="button" aria-label={t("story.aria.mic")}>
                     <svg
                       viewBox="0 0 24 24"
                       width="18"

@@ -111,7 +111,9 @@ const DollyGallery = forwardRef<HTMLDivElement, DollyGalleryProps>(function Doll
     const start = () => {
       if (running) return;
       running = true;
-      gsap.set(root, { autoAlpha: 1 });
+      // Visibility/opacity is driven by the story timeline (scrubbed with the
+      // backwhole) so the cards fade in/out together with the backdrop instead
+      // of popping on/off at a threshold.
       moveTimeline.pause(0);
     };
     const updateProgress = (event: Event) => {
