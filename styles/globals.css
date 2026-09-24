@@ -35,7 +35,7 @@
   --plan-hover-border: rgba(178,155,255,0.35);
   --on-accent: #ffffff;
   --btn-ai-hover-bg: #b89bff;
-  --phone-shadow: rgba(0, 0, 0, 0.8);
+  --phone-shadow: rgba(0, 0, 0, 0.95);
 }
 
 /* Light theme: same identity, same structure — only the color tokens swap.
@@ -66,7 +66,7 @@
   --plan-hover-border: rgba(114,56,240,0.4);
   --on-accent: #ffffff;
   --btn-ai-hover-bg: #5a2cd0;
-  --phone-shadow: rgba(25, 21, 34, 0.25);
+  --phone-shadow: rgba(20, 17, 28, 0.75);
 }
 
 * {
@@ -677,28 +677,25 @@ footer .footer-brand-desc {
   aspect-ratio: 0.4868;
   z-index: 4;
 }
-.story-visual-box::before {
-  content: "";
-  position: absolute;
-  inset: -12%;
-  z-index: -1;
-  background: radial-gradient(ellipse at center, rgba(114, 56, 240, 0.4) 0%, transparent 65%);
-  filter: blur(50px);
-  pointer-events: none;
-}
-/* Cast shadow behind the phone: a dark blurred silhouette slightly larger
-   than the device and offset downward, so the phone reads as floating above
-   the dark background (3D depth). Paints above the purple glow (::before)
-   but behind the device itself. */
+/* Real shadow: projected from the conversation screen frame (not the phone
+   rim), offset to the right and below as if the light comes from the left.
+   Because the offset pushes the shadow right/down, its left/top portions stay
+   hidden behind the device — the shadow only reads on the right side and
+   underneath the phone. */
 .story-visual-box::after {
   content: "";
   position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: 26px;
+  /* Match the screen cutout so the shadow follows the conversation
+     background frame instead of the phone rim. */
+  left: 4.6%;
+  right: 4.5%;
+  top: 2.0%;
+  bottom: 1.9%;
+  border-radius: 40px;
   background: var(--phone-shadow);
-  filter: blur(38px);
-  transform: translateY(6%) scale(1.04);
+  filter: blur(16px);
+  transform: translate(16%, 12%);
+  z-index: -1;
   pointer-events: none;
 }
 .odysen-cell-interaction {
@@ -2021,8 +2018,9 @@ footer .social[data-tooltip]:hover::before {
     height: min(62vh, 430px);
   }
   .story-visual-box::after {
-    filter: blur(22px);
-    transform: translateY(5%) scale(1.05);
+    border-radius: 16px;
+    filter: blur(10px);
+    transform: translate(14%, 10%);
   }
   .story-dolly-gallery {
     display: none;
@@ -2047,6 +2045,9 @@ footer .social[data-tooltip]:hover::before {
     object-fit: cover;
     border-radius: 12px;
     border: 1px solid var(--border);
+    /* Dark placeholder so the card never shows the white page background
+       while the lazy image is still loading on first load. */
+    background: #0d0a1a;
     opacity: 0;
     will-change: transform, opacity;
   }

@@ -273,7 +273,10 @@ export function useWhatsappStory({
             t.to(bannerImgs[i - 1], { opacity: 0, y: -14, duration: 0.4, ease: "power1.in" }, outAt);
             t.fromTo(bannerImgs[i], { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, outAt + 0.2);
           }
-          t.to(bannerImgs[3], { opacity: 0, y: -14, duration: 0.45, ease: "power1.in" }, 24.2);
+          // Keep the last banner on screen until the phone starts returning so
+          // there is never a frame where every banner is transparent and the
+          // white page background shows through the banner container.
+          t.to(bannerImgs[3], { opacity: 0, y: -14, duration: 0.45, ease: "power1.in" }, 24.8);
 
           // ---- Act 3: phone returns, conversation resets, loop ----
           t.call(resetConversation, [], 24.6);
