@@ -163,6 +163,10 @@ export function useWhatsappStory({
         glowAnim = null;
       }
       gsap.set(box, { opacity: 1, scale: 1, y: 0, transformOrigin: "50% 50%" });
+      // The phone shadow lives on .story-visual-box (the parent), so the parent
+      // must be reset alongside the phone itself — otherwise the shadow stays
+      // visible after the phone is hidden and bleeds into the next section.
+      if (box.parentElement) gsap.set(box.parentElement, { opacity: 1 });
       gsap.set(camera, { scale: 1, y: 0, transformOrigin: "50% 18%" });
       if (storyFx) gsap.set(storyFx, { opacity: 0 });
       gsap.set(list, { y: 0, scale: 1 });
@@ -437,6 +441,10 @@ export function useWhatsappStory({
         // the cards never appear zoomed.
         .to(camera, { scale: 1, y: 0, duration: 0.2, ease: "power2.out" }, 0.97)
         .set(box, { opacity: 0, zIndex: 2 }, 1.17)
+        // Hide the parent too: the phone shadow is a pseudo-element of
+        // .story-visual-box, so it would otherwise stay visible at the top of
+        // the viewport while the camera scrolls away into the next section.
+        .set(box.parentElement, { opacity: 0 }, 1.17)
         .to(backwhole, { opacity: 1, scale: 1, duration: 0.22, ease: "power2.out" }, 1.17)
         // Fade the gallery with the backwhole (scrubbed together) so the cards
         // never pop on/off or float over the scene while scrolling back.

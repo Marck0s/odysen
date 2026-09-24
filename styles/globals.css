@@ -585,7 +585,12 @@ footer .footer-brand-desc {
 }
 .story-black-transition {
   z-index: 6;
-  background: var(--bg);
+  /* The dive must close in on a DARK screen in both themes (it hides the
+     phone reset behind it). var(--bg) is white in the light theme, which
+     made this "black" transition render as a white square growing from the
+     input bar during the dive. #07060b matches the dark page background and
+     the color the inputbar darkens to at the start of the dive. */
+  background: #07060b;
   opacity: 0;
   will-change: top, left, width, height, border-radius, opacity;
 }

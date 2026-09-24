@@ -4,7 +4,7 @@
  * import them from here instead.
  */
 
-export const WHATSAPP_NUMBER = "5511999999999"; // TODO: replace with the real Odysen number
+export const WHATSAPP_NUMBER = "5511963806166";
 
 export const whatsappLink = (message?: string) => {
   const base = `https://wa.me/${WHATSAPP_NUMBER}`;
