@@ -691,7 +691,7 @@ footer .footer-brand-desc {
   right: 4.5%;
   top: 2.0%;
   bottom: 1.9%;
-  border-radius: 40px;
+  border-radius: 72px;
   background: var(--phone-shadow);
   filter: blur(16px);
   transform: translate(16%, 12%);
@@ -2018,7 +2018,7 @@ footer .social[data-tooltip]:hover::before {
     height: min(62vh, 430px);
   }
   .story-visual-box::after {
-    border-radius: 16px;
+    border-radius: 32px;
     filter: blur(10px);
     transform: translate(14%, 10%);
   }
