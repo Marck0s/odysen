@@ -19,10 +19,9 @@ export default function Portfolio() {
         </div>
         <h2
           ref={titleRef}
-          style={{ fontSize: "clamp(28px,4.5vw,52px)", textTransform: "uppercase", marginBottom: 50, maxWidth: 700 }}
-        >
-          {t("work.title")}
-        </h2>
+          dangerouslySetInnerHTML={{ __html: t("work.title") }}
+          style={{ marginBottom: 50, maxWidth: 700 }}
+        />
         <div className="project-grid">
           {PROJECTS.map((p) => (
             <article className="project-card" key={p.id}>

@@ -1334,6 +1334,17 @@ footer .footer-brand-desc {
   position: relative;
   border-top: 1px solid var(--border);
 }
+.portfolio .container > h2 {
+  font-family: var(--font-inter), "Inter", sans-serif;
+  font-weight: 400;
+  font-size: clamp(26px, 4vw, 46px);
+  line-height: 1.15;
+}
+.portfolio .container > h2 em {
+  font-style: normal;
+  color: var(--purple-light);
+  display: block;
+}
 /* ---------- portfolio: project cards ---------- */
 .project-grid {
   display: grid;

@@ -17,10 +17,10 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://odysen.com"),
-  title: "Odysen — Criação, automação e crescimento digital",
+  title: "Odysen - Crescimento digital",
   description:
     "A Odysen constrói, automatiza e eleva negócios digitais através de websites, chatbots inteligentes, tráfego pago e marketing.",
-  icons: { icon: "/assets/odysen-logo/odysen-logo.png" },
+  icons: { icon: "/assets/odysen-logo/odysen-favicon.png" },
   openGraph: {
     title: "Odysen — Digital creation. Intelligent automation. Business growth.",
     description: "A Odysen constrói, automatiza e eleva negócios digitais.",
