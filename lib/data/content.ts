@@ -1,36 +1,26 @@
-export interface CaseStudy {
-  number: string;
-  name: string;
-  tag: string;
-}
-
-export const CASE_STUDIES: CaseStudy[] = [
-  { number: "01", name: "Verdê Alimentos", tag: "Websites & Marketing" },
-  { number: "02", name: "Grupo Marall Imóveis", tag: "Chatbot & Automação" },
-  { number: "03", name: "Vittá Clínicas", tag: "Tráfego pago" },
-  { number: "04", name: "Nortek Distribuidora", tag: "Websites & Chatbot" },
-];
-
 export interface Project {
   id: string;
   name: string;
   image: string;
   url: string;
+  tag: string;
 }
 
 export const PROJECTS: Project[] = [
+  {
+    id: "serralheria-kaiser",
+    name: "Serralheria Kaiser",
+    image: "/assets/projects-work/serralheria-kaiser.webp",
+    url: "https://serralheriakaiser.com.br/",
+    tag: "work.tagWebsiteLeads",
+  },
   {
     id: "nutri-fernanda",
     name: "Nutri Fernanda",
     image: "/assets/projects-work/nutri-fernanda.webp",
     // TODO: substituir pelo link real do deploy quando estiver no ar.
     url: "https://nutriferranda.com.br",
-  },
-  {
-    id: "serralheria-kaiser",
-    name: "Serralheria Kaiser",
-    image: "/assets/projects-work/serralheria-kaiser.webp",
-    url: "https://serralheriakaiser.com.br/",
+    tag: "work.tagWebsiteLeads",
   },
 ];
 

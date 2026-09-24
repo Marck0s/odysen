@@ -338,9 +338,14 @@ footer .footer-brand-desc {
   overflow: hidden;
 }
 .btn-primary {
-  background: var(--fg);
-  color: var(--bg);
-  border-color: transparent;
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--fg);
+  border-color: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+}
+.btn-primary:hover {
+  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(255, 255, 255, 0.14);
 }
 .btn span.arrow {
   transition: transform var(--dur-s) var(--ease);
@@ -1211,6 +1216,14 @@ footer .footer-brand-desc {
   justify-content: center;
   font-size: 13px;
 }
+.plan .btn-primary {
+  background: var(--purple);
+  color: var(--fg);
+  border-color: transparent;
+}
+.plan .btn-primary:hover {
+  background: #8a55f5;
+}
 
 /* ---------- about / ambition (split) ---------- */
 .split {
@@ -1321,43 +1334,6 @@ footer .footer-brand-desc {
   position: relative;
   border-top: 1px solid var(--border);
 }
-.case-list {
-  display: flex;
-  flex-direction: column;
-}
-.case-row {
-  display: grid;
-  grid-template-columns: 60px 1fr 200px 140px;
-  align-items: center;
-  gap: 24px;
-  padding: 26px 0;
-  border-top: 1px solid var(--border);
-  transition: background var(--dur-s) var(--ease);
-}
-.case-row:hover {
-  background: rgba(255, 255, 255, 0.02);
-}
-.case-row .cn {
-  font-size: 12px;
-  color: var(--muted);
-}
-.case-row h4 {
-  font-size: 20px;
-  text-transform: uppercase;
-}
-.case-row .tag {
-  font-size: 12.5px;
-  color: var(--purple-light);
-}
-.case-row .go {
-  font-size: 13px;
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  justify-content: flex-end;
-}
-
 /* ---------- portfolio: project cards ---------- */
 .project-grid {
   display: grid;
@@ -1372,6 +1348,14 @@ footer .footer-brand-desc {
 .project-name {
   font-size: 20px;
   text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.project-tag {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--purple-light);
   margin-bottom: 14px;
 }
 .project-image {
@@ -1785,15 +1769,6 @@ footer .social[data-tooltip]:hover::before {
   .team-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  .case-row {
-    grid-template-columns: 40px 1fr;
-    row-gap: 6px;
-  }
-  .case-row .tag,
-  .case-row .go {
-    grid-column: 2;
-    justify-content: flex-start;
-  }
   .process-item {
     grid-template-columns: 50px 1fr;
     row-gap: 8px;
@@ -1922,7 +1897,7 @@ footer .social[data-tooltip]:hover::before {
     display: block;
     transform: translate(-50%, -50%);
     width: min(calc((100% - 8px) * 1.75), calc(100vw - 32px));
-    aspect-ratio: 40 / 21;
+    aspect-ratio: 1 / 1;
     z-index: 6;
   }
   .story-banners img {
@@ -1953,7 +1928,7 @@ footer .social[data-tooltip]:hover::before {
     position: static;
     width: 100%;
     height: auto;
-    aspect-ratio: 40 / 21;
+    aspect-ratio: 1 / 1;
     opacity: 1;
   }
 
@@ -2061,19 +2036,19 @@ footer .social[data-tooltip]:hover::before {
     font-size: 7.5px;
   }
   .product-card {
-    gap: 7px;
-    padding: 6px;
-    border-radius: 11px;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 12px;
   }
   .product-visual {
-    width: 38px;
-    height: 38px;
-    border-radius: 8px;
+    width: 48px;
+    height: 48px;
+    border-radius: 9px;
   }
   .product-visual .chip-visual,
   .product-visual .mini-flow,
   .product-visual .mini-graph {
-    height: 38px;
+    height: 48px;
   }
   .product-visual .mini-browser {
     border-radius: 5px;
@@ -2112,14 +2087,14 @@ footer .social[data-tooltip]:hover::before {
     margin-left: 1px;
   }
   .product-info {
-    gap: 2px;
+    gap: 3px;
   }
   .product-name {
-    font-size: 10.5px;
+    font-size: 11.5px;
   }
   .product-desc {
-    font-size: 8.5px;
-    line-height: 1.35;
+    font-size: 9.5px;
+    line-height: 1.4;
   }
   .phone-inputbar {
     gap: 4px;
