@@ -70,6 +70,7 @@ export function useWhatsappStory({
     const blackTransition = blackTransitionRef.current;
     const backwhole = backwholeRef.current;
     if (!section || !list || !body || !box || !camera || !gallery || !inputbar || !blackTransition || !backwhole) return;
+    const caret = inputbar.querySelector<HTMLElement>(".inputbar-caret");
     const storyFx = camera.querySelector<HTMLElement>('.floating-lines-container');
 
     const els = bubbles
@@ -175,6 +176,7 @@ export function useWhatsappStory({
         transformOrigin: "50% 50%",
         scale: 1,
       });
+      if (caret) gsap.set(caret, { visibility: "visible" });
       gsap.set(blackTransition, {
         opacity: 0,
         top: "72%",
@@ -391,10 +393,24 @@ export function useWhatsappStory({
         .to(camera, { scale: 1.32, y: 14, duration: 0.27, ease: "power2.inOut" }, 0.18)
         .to(camera, { scale: 1.52, y: 22, duration: 0.45, ease: "none" }, 0.45)
         .set(box, { zIndex: 8, transformOrigin: `${originX}% ${originY}%` }, 0.95)
+        // Hide the blinking caret before the dive: it would otherwise scale
+        // with the inputbar into a giant white bar inside the black field.
+        // `visibility` (not opacity) is used because the caret's CSS animation
+        // `caretBlink` animates opacity and would override an inline GSAP
+        // opacity; visibility is not animated by it, so the scrub can revert
+        // the set cleanly when scrolling back.
+        .set(caret, { visibility: "hidden" }, 0.95)
+        // Darken the field first (fast), THEN expand it — so the expansion
+        // grows out of an already-black field instead of a light rectangle
+        // that turns black mid-grow.
         .to(inputbar, {
           backgroundColor: "#07060b",
           borderColor: "rgba(0, 0, 0, 0)",
           borderRadius: "0px",
+          duration: 0.08,
+          ease: "power1.in",
+        }, 0.95)
+        .to(inputbar, {
           scale: 2.7,
           duration: 0.18,
           ease: "power3.in",

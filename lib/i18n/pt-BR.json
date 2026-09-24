@@ -4,6 +4,8 @@
   "nav.about": "Sobre",
   "nav.contact": "Contato",
   "nav.cta": "Iniciar projeto",
+  "nav.theme.toLight": "Ativar modo claro",
+  "nav.theme.toDark": "Ativar modo escuro",
 
   "hero.line1": "SEU NEGÓCIO.",
   "hero.line2": "DIGITALIZADO.",

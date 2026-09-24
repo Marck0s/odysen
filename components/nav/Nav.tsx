@@ -5,6 +5,7 @@ import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useMagnetic } from "@/hooks/useMagnetic";
 import LangToggle from "@/components/ui/LangToggle";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export default function Nav() {
   const { t } = useLanguage();
@@ -157,6 +158,7 @@ export default function Nav() {
         </div>
 
         <div className="nav-right" ref={rightRef}>
+          <ThemeToggle />
           <a href="#contato" className="btn btn-primary" ref={ctaRef}>
             <span>{t("nav.cta")}</span>
             <span className="arrow">→</span>

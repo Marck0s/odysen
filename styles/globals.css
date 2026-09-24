@@ -14,6 +14,59 @@
   --ease: cubic-bezier(0.16, 0.84, 0.44, 1);
   --dur-s: 0.35s;
   --dur-m: 0.7s;
+  /* Semantic surfaces & controls — dark defaults, identical to the hardcoded
+     values used across the site today. */
+  --surface: rgba(255,255,255,0.02);
+  --surface-hover: rgba(255,255,255,0.045);
+  --surface-strong: rgba(255,255,255,0.06);
+  --control-bg: rgba(255,255,255,0.025);
+  --control-border: rgba(255,255,255,0.08);
+  --control-border-hover: rgba(255,255,255,0.14);
+  --hover-bg: rgba(255,255,255,0.03);
+  --nav-bg: linear-gradient(180deg, rgba(7,6,11,0.34) 0%, rgba(7,6,11,0.12) 58%, transparent 100%);
+  --nav-bg-scrolled: linear-gradient(180deg, rgba(7,6,11,0.58) 0%, rgba(7,6,11,0.3) 72%, transparent 100%);
+  --menu-bg: rgba(7,6,11,0.96);
+  --menu-shadow: 0 18px 40px rgba(0,0,0,0.35);
+  --card-bg: rgba(255,255,255,0.02);
+  --card-rec-bg: linear-gradient(160deg, rgba(114,56,240,0.14), rgba(255,255,255,0.02));
+  --team-card-bg: linear-gradient(150deg, #171025, #0a0712);
+  --initials-color: rgba(255,255,255,0.06);
+  --initials-hover: rgba(178,155,255,0.16);
+  --plan-hover-border: rgba(178,155,255,0.35);
+  --on-accent: #ffffff;
+  --btn-ai-hover-bg: #b89bff;
+  --phone-shadow: rgba(0, 0, 0, 0.8);
+}
+
+/* Light theme: same identity, same structure — only the color tokens swap.
+   --purple / --purple-deep / --purple-dim keep their brand values. */
+[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-soft: #f6f3fc;
+  --fg: #191522;
+  --muted: #5d576b;
+  --border: rgba(25,21,34,0.1);
+  --purple-light: #7238f0;
+  --surface: rgba(25,21,34,0.035);
+  --surface-hover: rgba(25,21,34,0.06);
+  --surface-strong: rgba(25,21,34,0.08);
+  --control-bg: rgba(25,21,34,0.04);
+  --control-border: rgba(25,21,34,0.12);
+  --control-border-hover: rgba(25,21,34,0.2);
+  --hover-bg: rgba(25,21,34,0.05);
+  --nav-bg: linear-gradient(180deg, rgba(233,231,239,0.72) 0%, rgba(233,231,239,0.3) 58%, transparent 100%);
+  --nav-bg-scrolled: linear-gradient(180deg, rgba(233,231,239,0.92) 0%, rgba(233,231,239,0.62) 72%, transparent 100%);
+  --menu-bg: rgba(255,255,255,0.97);
+  --menu-shadow: 0 18px 40px rgba(25,21,34,0.14);
+  --card-bg: rgba(25,21,34,0.03);
+  --card-rec-bg: linear-gradient(160deg, rgba(114,56,240,0.1), rgba(25,21,34,0.02));
+  --team-card-bg: linear-gradient(150deg, #f3effb, #e9e3f6);
+  --initials-color: rgba(25,21,34,0.07);
+  --initials-hover: rgba(114,56,240,0.14);
+  --plan-hover-border: rgba(114,56,240,0.4);
+  --on-accent: #ffffff;
+  --btn-ai-hover-bg: #5a2cd0;
+  --phone-shadow: rgba(25, 21, 34, 0.25);
 }
 
 * {
@@ -86,6 +139,14 @@ img {
   flex: none;
 }
 
+/* Visible keyboard focus ring in both themes (--purple-light is #b89bff in
+   dark and #7238f0 in light — both visible against their backgrounds). */
+:focus-visible {
+  outline: 2px solid var(--purple-light);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.001ms !important;
@@ -95,6 +156,24 @@ img {
   .cell-screen::after {
     animation: none !important;
     transform: translateX(400%) skewX(-18deg) !important;
+  }
+}
+
+/* Theme swap: only while .theme-transition is present (added by the
+   ThemeProvider during a toggle) do colors crossfade. */
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition: background-color 0.35s var(--ease), color 0.35s var(--ease), border-color 0.35s var(--ease), box-shadow 0.35s var(--ease), fill 0.35s var(--ease), stroke 0.35s var(--ease) !important;
+}
+/* The reduced-motion block above zeroes transition-duration globally, but the
+   theme-transition rule has higher specificity — re-zero it here so reduced
+   motion users never see the 0.35s color crossfade. */
+@media (prefers-reduced-motion: reduce) {
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after {
+    transition-duration: 0.001ms !important;
   }
 }
 
@@ -159,12 +238,12 @@ header.nav {
   padding: 22px 0;
   transition: padding var(--dur-s) var(--ease), background var(--dur-s) var(--ease), border-color var(--dur-s) var(--ease);
   border-bottom: 1px solid transparent;
-  background: linear-gradient(180deg, rgba(7, 6, 11, 0.34) 0%, rgba(7, 6, 11, 0.12) 58%, transparent 100%);
+  background: var(--nav-bg);
   backdrop-filter: blur(7px);
 }
 header.nav.scrolled {
   padding: 14px 0;
-  background: linear-gradient(180deg, rgba(7, 6, 11, 0.58) 0%, rgba(7, 6, 11, 0.3) 72%, transparent 100%);
+  background: var(--nav-bg-scrolled);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
 }
@@ -186,8 +265,8 @@ header.nav.scrolled {
   padding: 10px 14px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: rgba(7, 6, 11, 0.96);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  background: var(--menu-bg);
+  box-shadow: var(--menu-shadow);
   backdrop-filter: blur(12px);
   z-index: 120;
 }
@@ -203,7 +282,7 @@ header.nav.scrolled {
 
 .mobile-menu a:hover {
   color: var(--fg);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--hover-bg);
 }
 
 .mobile-menu .mobile-lang {
@@ -272,8 +351,8 @@ footer .footer-brand-desc {
   height: 2.2em;
   padding: 0.3em;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--control-bg);
+  border: 1px solid var(--control-border);
   backdrop-filter: blur(10px);
   flex: none;
 }
@@ -338,14 +417,14 @@ footer .footer-brand-desc {
   overflow: hidden;
 }
 .btn-primary {
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--control-bg);
   color: var(--fg);
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--control-border);
   backdrop-filter: blur(10px);
 }
 .btn-primary:hover {
-  background: rgba(255, 255, 255, 0.045);
-  border-color: rgba(255, 255, 255, 0.14);
+  background: var(--surface-hover);
+  border-color: var(--control-border-hover);
 }
 .btn span.arrow {
   transition: transform var(--dur-s) var(--ease);
@@ -366,8 +445,27 @@ footer .footer-brand-desc {
   transition: background var(--dur-s) var(--ease), border-color var(--dur-s) var(--ease);
 }
 .menu-toggle:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--surface-strong);
   border-color: var(--purple-light);
+}
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  transition: background var(--dur-s) var(--ease), border-color var(--dur-s) var(--ease), color var(--dur-s) var(--ease);
+}
+.theme-toggle:hover {
+  background: var(--surface-strong);
+  border-color: var(--purple-light);
+}
+.theme-toggle svg {
+  width: 18px;
+  height: 18px;
 }
 
 /* ---------- hero ---------- */
@@ -574,7 +672,9 @@ footer .footer-brand-desc {
 .story-visual-box {
   position: relative;
   height: min(92vh, 902px);
-  aspect-ratio: 0.49;
+  /* Matches the mold asset (740x1520 = 0.4868) so object-fit: cover renders
+     the frame without cropping the top/bottom bezels. */
+  aspect-ratio: 0.4868;
   z-index: 4;
 }
 .story-visual-box::before {
@@ -596,7 +696,7 @@ footer .footer-brand-desc {
   inset: 0;
   z-index: -1;
   border-radius: 26px;
-  background: rgba(0, 0, 0, 0.8);
+  background: var(--phone-shadow);
   filter: blur(38px);
   transform: translateY(6%) scale(1.04);
   pointer-events: none;
@@ -609,15 +709,30 @@ footer .footer-brand-desc {
 }
 .cell-screen {
   position: absolute;
-  left: 4.7%;
-  right: 4.7%;
-  top: 1.8%;
-  bottom: 1.7%;
-  border-radius: 20px;
+  /* Aligned to the mold's actual screen cutout (left 4.73%, right 4.60%,
+     top 2.105%, bottom 2.039%) with a ~1px safety margin so the frame always
+     covers the screen edges — no hairline gaps. */
+  left: 4.6%;
+  right: 4.5%;
+  top: 2.0%;
+  bottom: 1.9%;
+  border-radius: 40px;
   overflow: hidden;
   background: linear-gradient(180deg, #0f0a1a, #050308);
   display: flex;
   flex-direction: column;
+  /* The phone mockup is a dark screen by design — pin the dark tokens locally
+     so every var() inside it resolves dark in both themes. The explicit
+     `color` (resolving to the pinned light --fg) keeps inherited dialogue
+     text white even in the light theme, where the page-level --fg is dark. */
+  --bg: #07060b;
+  --fg: #f2eff8;
+  --muted: #948fa3;
+  color: var(--fg);
+  --border: rgba(242,239,248,0.08);
+  --purple-light: #b89bff;
+  --purple-dim: #3a2568;
+  --purple: #7238f0;
 }
 /* Glass glare: a subtle diagonal light reflection across the screen glass,
    plus a slow sheen sweep that drifts across every few seconds. Both sit
@@ -1148,21 +1263,25 @@ footer .footer-brand-desc {
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
+/* Carousel dots only exist on mobile (≤767px); hidden everywhere else. */
+.plans-dots {
+  display: none;
+}
 .plan {
   padding: 32px 26px;
   border-radius: var(--radius-m);
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--card-bg);
   position: relative;
   transition: border-color var(--dur-s) var(--ease), transform var(--dur-s) var(--ease);
 }
 .plan:hover {
-  border-color: rgba(178, 155, 255, 0.35);
+  border-color: var(--plan-hover-border);
   transform: translateY(-4px);
 }
 .plan.rec {
   border-color: var(--purple-light);
-  background: linear-gradient(160deg, rgba(114, 56, 240, 0.14), rgba(255, 255, 255, 0.02));
+  background: var(--card-rec-bg);
 }
 .plan .rec-badge {
   position: absolute;
@@ -1218,7 +1337,7 @@ footer .footer-brand-desc {
 }
 .plan .btn-primary {
   background: var(--purple);
-  color: var(--fg);
+  color: var(--on-accent);
   border-color: transparent;
 }
 .plan .btn-primary:hover {
@@ -1282,7 +1401,7 @@ footer .footer-brand-desc {
   position: relative;
   overflow: hidden;
   border-right: 1px solid var(--border);
-  background: linear-gradient(150deg, #171025, #0a0712);
+  background: var(--team-card-bg);
   display: flex;
   align-items: flex-end;
   padding: 22px;
@@ -1306,11 +1425,11 @@ footer .footer-brand-desc {
   justify-content: center;
   font-family: "Space Grotesk", sans-serif;
   font-size: 64px;
-  color: rgba(255, 255, 255, 0.06);
+  color: var(--initials-color);
   transition: color var(--dur-m) var(--ease), transform var(--dur-m) var(--ease);
 }
 .team-card:hover .initials {
-  color: rgba(178, 155, 255, 0.16);
+  color: var(--initials-hover);
   transform: scale(1.08);
 }
 .team-card .info {
@@ -1452,7 +1571,7 @@ footer .footer-brand-desc {
   padding: 36px;
   border-radius: var(--radius-m);
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--card-bg);
 }
 .t-card p.quote {
   font-size: 19px;
@@ -1555,6 +1674,15 @@ footer {
   padding: 50px 0;
   position: relative;
   z-index: 1;
+}
+/* Light theme: the white logo needs a dark mark to stay visible on the
+   light-gray surfaces, and the footer gets the same light gray as the nav. */
+[data-theme="light"] footer {
+  background: #e9e7ef;
+}
+[data-theme="light"] header.nav .logo .logo-mark,
+[data-theme="light"] footer .logo .logo-mark {
+  filter: brightness(0);
 }
 .footer-inner {
   display: flex;
@@ -1669,12 +1797,12 @@ footer .social[data-tooltip]:hover::before {
 }
 .btn-ai {
   background: var(--purple);
-  color: var(--fg);
+  color: var(--on-accent);
   border-color: transparent;
   transition: background var(--dur-s) var(--ease), color var(--dur-s) var(--ease), transform var(--dur-s) var(--ease);
 }
 .btn-ai:hover {
-  background: var(--purple-light);
+  background: var(--btn-ai-hover-bg);
   color: var(--bg);
   transform: translateY(-1px);
 }
@@ -1789,7 +1917,7 @@ footer .social[data-tooltip]:hover::before {
   }
   .story-visual-box {
     height: min(92vh, 610px);
-    aspect-ratio: 0.49;
+    aspect-ratio: 0.4868;
   }
   .story-dolly-gallery img {
     width: min(72vw, 360px);
@@ -2131,6 +2259,59 @@ footer .social[data-tooltip]:hover::before {
     height: 4px;
   }
 }
+/* Mobile plans carousel: the three plan cards become horizontally scrollable
+   slides with native snap instead of stacking vertically. The container breaks
+   out of .container's 28px padding edge-to-edge; the 28px side padding
+   realigns the first card with the page content and the 16px top padding keeps
+   the .rec-badge (top: -11px) from being clipped by the overflow. */
+@media (max-width: 767px) {
+  .plans {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    /* No touch-action restriction: the browser's native direction detection
+       lets vertical swipes scroll the page while horizontal swipes move the
+       carousel. `pan-x` here would block page scrolling over the cards. */
+    gap: 14px;
+    margin: 0 -28px;
+    padding: 16px 28px 20px;
+    scroll-padding-left: 28px;
+    scroll-padding-right: 28px;
+    scrollbar-width: none;
+  }
+  .plans::-webkit-scrollbar {
+    display: none;
+  }
+  .plan {
+    flex: 0 0 84%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+  .plans-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .plans-dots button {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--muted);
+    opacity: 0.4;
+    padding: 0;
+    transition: width var(--dur-s) var(--ease), opacity var(--dur-s) var(--ease), background-color var(--dur-s) var(--ease);
+  }
+  .plans-dots button[aria-current="true"] {
+    width: 18px;
+    background: var(--purple-light);
+    opacity: 1;
+  }
+}
 @media (min-width: 768px) and (max-width: 1200px) {
   .story-caption {
     display: none;
@@ -2186,6 +2367,31 @@ footer .social[data-tooltip]:hover::before {
     width: 100%;
     max-width: 320px;
     justify-content: center;
+  }
+}
+@media (max-width: 360px) {
+  /* Very narrow phones: the ThemeToggle joined .nav-right, so the CTA needs
+     tighter gaps, a smaller logo, and nowrap to keep "Iniciar projeto" on a
+     single line without overflowing. */
+  .nav-inner {
+    gap: 12px;
+  }
+  .nav-left,
+  .nav-right {
+    gap: 8px;
+  }
+  header.nav .logo {
+    width: 96px;
+  }
+  .btn {
+    padding: 8px 10px;
+    white-space: nowrap;
+  }
+  .theme-toggle,
+  .menu-toggle {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 auto;
   }
 }
 @media (min-width: 1920px) {
