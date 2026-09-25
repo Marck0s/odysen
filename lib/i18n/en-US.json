@@ -1,6 +1,6 @@
 {
   "nav.services": "Services",
-  "nav.work": "Work",
+  "nav.work": "Projects",
   "nav.about": "About",
   "nav.contact": "Contact",
   "nav.cta": "Start a project",
@@ -132,7 +132,7 @@
   "ambition.p1": "To build a technology company that helps businesses evolve continuously. We combine engineering, artificial intelligence, automation, design and digital growth to turn real needs into solutions that create value. We don't believe in transformation as a project with an end date. We believe in building, measuring, learning and evolving continuously.",
   "ambition.p2": "We measure impact, not just deliverables. Every project advances in clear stages, with decisions guided by data, context and hands-on experience.",
 
-  "work.eyebrow": "WORK",
+  "work.eyebrow": "PROJECTS",
   "work.title": "We don't just talk about digital transformation. <em>We build it.</em>",
   "work.cta": "View project",
   "work.tagWebsiteLeads": "Website & Lead Generation",

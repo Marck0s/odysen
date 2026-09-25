@@ -25,15 +25,16 @@ interface UseWhatsappStoryArgs {
   products: RefObject<HTMLDivElement>[];
   headline1: string;
   headline2: string;
+  theme: "light" | "dark";
 }
 
 /**
  * Tinker-style pinned phone with a live conversation:
- * - Desktop: the phone does a slight zoom-in anchored at its top (focusing the
- *   first message), then the view descends through the conversation as
- *   messages and product cards arrive, and finally dives into the inputbar to
- *   reveal the gallery — all scrubbed to scroll. The device stays fixed
- *   (sticky) while the page scrolls.
+ * - Desktop: ONE initial zoom into the upper portion of the phone (focusing the
+ *   first message), then the zoom stays CONSTANT while the camera travels
+ *   vertically through the conversation as messages and product cards arrive,
+ *   and finally dives into the inputbar to reveal the gallery — all scrubbed
+ *   to scroll. The device stays fixed (sticky) while the page scrolls.
  * - Mobile: no pinned/scroll-locked sequence. The phone shows the full
  *   conversation statically in the normal flow and, on a looping timeline, it
  *   fades away while the odysen-banners cards replace each other one by one in
@@ -56,6 +57,7 @@ export function useWhatsappStory({
   products,
   headline1,
   headline2,
+  theme,
 }: UseWhatsappStoryArgs) {
   const reduced = useMotionPreference();
 
@@ -72,6 +74,10 @@ export function useWhatsappStory({
     if (!section || !list || !body || !box || !camera || !gallery || !inputbar || !blackTransition || !backwhole) return;
     const caret = inputbar.querySelector<HTMLElement>(".inputbar-caret");
     const storyFx = camera.querySelector<HTMLElement>('.floating-lines-container');
+    // In dark mode the zoomed inputbar itself becomes the full-screen backdrop
+    // (the "screen"), so the separate black-transition and backwhole screens
+    // are skipped entirely — only the cards appear on top of the inputbar.
+    const isDark = theme === "dark";
 
     const els = bubbles
       .map((b) => b.ref.current)
@@ -109,7 +115,7 @@ export function useWhatsappStory({
         scale: 1,
       });
       gsap.set(blackTransition, { opacity: 0 });
-      gsap.set(backwhole, { opacity: 0, scale: 0.72 });
+      gsap.set(backwhole, { opacity: 0, scale: 0.06 });
       const reducedBanners = section.querySelector<HTMLElement>(".story-banners");
       if (reducedBanners) reducedBanners.classList.add("banners-reduced");
       return;
@@ -162,6 +168,20 @@ export function useWhatsappStory({
         glowAnim.kill();
         glowAnim = null;
       }
+      // Dark mode: the zoomed inputbar is the screen. The phone chrome is
+      // hidden only while the zoomed field actually covers the viewport —
+      // computed live in the driver below so forward and reverse scroll stay
+      // in sync (the reverse fast un-zoom never reveals a black phone).
+      const phoneUI = isDark
+        ? box.querySelectorAll<HTMLElement>(
+            ".cell-mold, .phone-statusbar, .phone-topbar, .phone-body, .phone-homebar, .inputbar-btn",
+          )
+        : null;
+      const cellScreen = isDark ? box.querySelector<HTMLElement>(".cell-screen") : null;
+      if (phoneUI) gsap.set(phoneUI, { opacity: 1 });
+      if (cellScreen) {
+        gsap.set(cellScreen, { clearProps: "backgroundImage,backgroundColor" });
+      }
       gsap.set(box, { opacity: 1, scale: 1, y: 0, transformOrigin: "50% 50%" });
       // The phone shadow lives on .story-visual-box (the parent), so the parent
       // must be reset alongside the phone itself — otherwise the shadow stays
@@ -179,17 +199,46 @@ export function useWhatsappStory({
         borderRadius: "18px",
         transformOrigin: "50% 50%",
         scale: 1,
+        y: 0,
       });
       if (caret) gsap.set(caret, { visibility: "visible" });
+
+      // Desktop camera choreography (the mobile branch ignores these values).
+      // Tinker-style: ONE initial zoom into the upper portion of the phone,
+      // then the zoom stays CONSTANT while the camera travels vertically
+      // through the phone as the user scrolls. The phone is centered in the
+      // 100vh camera; at CAMERA_ZOOM with the transform-origin at 50% 18% the
+      // phone's bottom edge lands below the viewport, so `travelY` is the
+      // distance the camera must move up to bring the lower portion of the
+      // phone (the inputbar) into view at the end of the section.
+      const CAMERA_ZOOM = 1.42;
+      const vh = window.innerHeight;
+      const boxRect = box.getBoundingClientRect();
+      const fieldRect = inputbar.getBoundingClientRect();
+      const phoneHeight = boxRect.height;
+      const phoneTop = (vh - phoneHeight) / 2;
+      const cameraOriginY = vh * 0.18;
+      const travelY = Math.max(
+        0,
+        cameraOriginY + (phoneTop + phoneHeight - cameraOriginY) * CAMERA_ZOOM - vh,
+      );
+      // The black "screen" that closes in during the dive grows from the
+      // inputbar's position. Because the camera is scaled, the black
+      // transition's top must be set to the inputbar's camera-space coord so
+      // the camera transform maps it onto the inputbar's on-screen position.
+      const inputbarCenterOffset = fieldRect.top + fieldRect.height / 2 - boxRect.top;
+      const inputbarCameraCoord = phoneTop + inputbarCenterOffset;
+      const blackTransitionTop = (inputbarCameraCoord / vh) * 100;
+
       gsap.set(blackTransition, {
         opacity: 0,
-        top: "72%",
+        top: `${blackTransitionTop}%`,
         left: "42%",
         width: "16%",
         height: "5%",
         borderRadius: "18px",
       });
-      gsap.set(backwhole, { opacity: 0, scale: 0.72 });
+      gsap.set(backwhole, { opacity: 0, scale: 0.06, borderRadius: "32px" });
 
       const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
@@ -203,7 +252,7 @@ export function useWhatsappStory({
         stopGallery();
         if (storyFx) gsap.set(storyFx, { opacity: 1 });
         gsap.set(blackTransition, { opacity: 0 });
-        gsap.set(backwhole, { opacity: 0, scale: 0.72 });
+        gsap.set(backwhole, { opacity: 0, scale: 0.06 });
 
         const visualBox = section.querySelector<HTMLElement>(".story-visual-box");
         const banners = section.querySelector<HTMLElement>(".story-banners");
@@ -301,16 +350,35 @@ export function useWhatsappStory({
       // ----- Desktop: scroll-scrubbed sequence -----
       // Zoom target: the center of the inputbar field, relative to the phone
       // box. The final transition dives INTO the field instead of expanding it.
-      const boxRect = box.getBoundingClientRect();
-      const fieldRect = inputbar.getBoundingClientRect();
+      // (boxRect/fieldRect are measured above, before the mobile branch.)
       const originX =
         ((fieldRect.left + fieldRect.width / 2 - boxRect.left) / boxRect.width) * 100;
       const originY =
         ((fieldRect.top + fieldRect.height / 2 - boxRect.top) / boxRect.height) * 100;
 
+      // Dark mode: the inputbar zoom IS the screen, so it must zoom far enough
+      // to cover the whole viewport at the peak box zoom (18x) — otherwise the
+      // phone chrome around it would peek through the edges. Light mode keeps
+      // the fixed 2.7x dive (the black transition covers the rest).
+      let inputbarScale = 2.7;
+      let diveCoverage = 0;
+      if (isDark) {
+        const centerOffset = fieldRect.top + fieldRect.height / 2 - vh / 2;
+        diveCoverage = vh + 2 * Math.abs(centerOffset);
+        inputbarScale = Math.max(2.7, (diveCoverage / (fieldRect.height * 18)) * 1.12);
+      }
+
       // Desktop descends to the bottom of the chat as the story plays out.
       const descentEnd = 0.9;
       const descentRange = Math.max(0, list.scrollHeight - body.clientHeight);
+
+      // Gallery reveal: the backdrop (rounded screen) arrives first, then the
+      // cards fade in on top of it. The card animation is scrubbed over the
+      // same scroll window so the cards start moving exactly when they become
+      // visible — never mid-motion.
+      const galleryFadeStart = 1.39;
+      const galleryFadeEnd = 1.61;
+      const galleryRevealStart = galleryFadeStart / galleryFadeEnd;
 
       const t = gsap.timeline({
         defaults: { ease: "power1.out" },
@@ -320,16 +388,31 @@ export function useWhatsappStory({
           end: "bottom bottom",
           scrub: 0.5,
           onUpdate: (self) => {
-            const backwholeVisible = Number(gsap.getProperty(backwhole, "opacity")) > 0.01;
-            if (backwholeVisible) {
+            // The gallery runs exactly while it is visible. Its opacity is
+            // driven by the scrubbed main timeline (the autoAlpha fade at
+            // galleryFadeStart), so this stays true in BOTH directions for the
+            // whole visible window. The old check (backwhole opacity in light
+            // mode / box scale in dark mode) flipped false on reverse scroll
+            // while the gallery was still on screen — e.g. the box un-zooms
+            // fast on reverse, so box.scale dropped below 1.5 within a few
+            // frames and stopGallery() reset the cards to 0 mid-view, making
+            // the reverse "jump" straight to the input state.
+            const backdropVisible = Number(gsap.getProperty(gallery, "opacity")) > 0.01;
+            if (backdropVisible) {
               startGalleryIfReady();
-              const galleryInput = gsap.utils.clamp(0, 1, (self.progress - 0.78) / 0.22);
+              const galleryInput = gsap.utils.clamp(
+                0,
+                1,
+                (self.progress - galleryRevealStart) / (1 - galleryRevealStart)
+              );
               updateGalleryProgress(Math.pow(galleryInput, 1.5));
             } else {
               stopGallery();
             }
 
-            const descentStart = 0.2;
+            // The chat list starts descending as soon as the camera's vertical
+            // travel begins (the camera zoom is already locked by then).
+            const descentStart = 0.16;
             const descentProgress = gsap.utils.clamp(
               0,
               1,
@@ -360,20 +443,20 @@ export function useWhatsappStory({
       let lastTime = 0;
       let displayScale = 1;
       let recovering = false;
+      let chromeHidden = false;
       t.eventCallback("onUpdate", () => {
         const now = t.time();
         const goingBack = now < lastTime;
         lastTime = now;
         const diveProgress = gsap.utils.clamp(0, 1, (now - 0.95) / 0.18);
-        const diveScale = now >= 0.95 ? 1 + 17 * Math.pow(diveProgress, 3) : 1;
+        const diveScale = now >= 0.95 ? 1 + 17 * Math.pow(diveProgress, 4) : 1;
 
         if (goingBack) {
           recovering = true;
-          // Un-zoom to near-natural scale fast (behind the opaque black), so
-          // when the black opens the phone is at ~1x — never a giant box.
+          // Un-zoom to near-natural scale fast (behind the opaque screen), so
+          // when the screen opens the phone is at ~1x — never a giant box.
           const target = 1 + (diveScale - 1) * 0.02;
           displayScale += (target - displayScale) * 0.5;
-          gsap.set(box, { scale: displayScale });
         } else {
           if (recovering && Math.abs(diveScale - displayScale) > 0.5) {
             displayScale += (diveScale - displayScale) * 0.4;
@@ -381,7 +464,29 @@ export function useWhatsappStory({
             recovering = false;
             displayScale = diveScale;
           }
-          gsap.set(box, { scale: displayScale });
+        }
+        gsap.set(box, { scale: displayScale });
+
+        // Dark mode: hide the phone chrome only while the zoomed inputbar
+        // covers the viewport. Tied to the live box scale (not a fixed
+        // timeline position) so the reverse scroll — where the box un-zooms
+        // fast — un-hides the phone in sync instead of leaving a black
+        // rectangle behind.
+        if (isDark && phoneUI) {
+          const inputbarScaleNow = 1 + (inputbarScale - 1) * Math.pow(diveProgress, 4);
+          const coversViewport =
+            fieldRect.height * inputbarScaleNow * displayScale >= diveCoverage;
+          if (coversViewport !== chromeHidden) {
+            chromeHidden = coversViewport;
+            gsap.set(phoneUI, { opacity: coversViewport ? 0 : 1 });
+            if (cellScreen) {
+              if (coversViewport) {
+                gsap.set(cellScreen, { backgroundImage: "none", backgroundColor: "#07060b" });
+              } else {
+                gsap.set(cellScreen, { clearProps: "backgroundImage,backgroundColor" });
+              }
+            }
+          }
         }
       });
       master = t;
@@ -390,15 +495,15 @@ export function useWhatsappStory({
         t.to(storyFx, { opacity: 1, duration: 0.38, ease: "power2.out" }, 0.1);
       }
 
-      // Multi-phase camera choreography: the camera "reads" the conversation.
-      // Phase 1 (0.00–0.18): wide settle — the phone is fully visible, gentle push.
-      // Phase 2 (0.18–0.45): push toward the first message at the top of the chat.
-      // Phase 3 (0.45–0.90): dolly tracking — the zoom tightens as the
-      //   conversation descends toward the inputbar (the climax).
-      // Phase 4 (0.95+): dive into the inputbar, then pull back to the gallery.
-      t.to(camera, { scale: 1.06, y: 6, duration: 0.18, ease: "power2.out" }, 0.0)
-        .to(camera, { scale: 1.32, y: 14, duration: 0.27, ease: "power2.inOut" }, 0.18)
-        .to(camera, { scale: 1.52, y: 22, duration: 0.45, ease: "none" }, 0.45)
+      // Camera choreography (Tinker-style): ONE initial zoom into the upper
+      // portion of the phone (0.00–0.16), then the zoom stays CONSTANT while
+      // the camera travels vertically through the phone (0.16–0.90) as the
+      // conversation descends toward the inputbar — the climax. The dive into
+      // the inputbar follows at 0.95+, then the camera pulls back to the
+      // gallery. `travelY` is computed above so the phone's bottom edge lands
+      // exactly at the viewport bottom at the end of the travel.
+      t.to(camera, { scale: CAMERA_ZOOM, y: 0, duration: 0.16, ease: "power2.inOut" }, 0.0)
+        .to(camera, { scale: CAMERA_ZOOM, y: -travelY, duration: 0.74, ease: "power1.inOut" }, 0.16)
         .set(box, { zIndex: 8, transformOrigin: `${originX}% ${originY}%` }, 0.95)
         // Hide the blinking caret before the dive: it would otherwise scale
         // with the inputbar into a giant white bar inside the black field.
@@ -409,7 +514,10 @@ export function useWhatsappStory({
         .set(caret, { visibility: "hidden" }, 0.95)
         // Darken the field first (fast), THEN expand it — so the expansion
         // grows out of an already-black field instead of a light rectangle
-        // that turns black mid-grow.
+        // that turns black mid-grow. The field also lifts out of the phone
+        // (y: -8) as it grows, so it reads as "leaving" the device toward the
+        // camera; the power4.in ease makes the dive accelerate into the
+        // screen-fill (matched by the driver's pow(..., 4) curves).
         .to(inputbar, {
           backgroundColor: "#07060b",
           borderColor: "rgba(0, 0, 0, 0)",
@@ -418,14 +526,32 @@ export function useWhatsappStory({
           ease: "power1.in",
         }, 0.95)
         .to(inputbar, {
-          scale: 2.7,
+          scale: inputbarScale,
+          y: -8,
           duration: 0.18,
-          ease: "power3.in",
+          ease: "power4.in",
         }, 0.95)
-        // The black closes in as the dive completes, so the screen is fully
-        // dark before the camera pull-back and box reset — the phone can
-        // never reappear.
-        .to(blackTransition, {
+        // The cards fade in only after the screen has fully arrived, so the
+        // screen comes first and the cards follow on top of it.
+        .to(gallery, { autoAlpha: 1, duration: 0.22, ease: "power2.out" }, galleryFadeStart);
+
+      if (isDark) {
+        // Dark mode: the zoomed inputbar IS the screen. The phone chrome is
+        // hidden by the driver (tied to the live box scale), so the phone
+        // stays fully visible while the inputbar zooms over it. The camera
+        // dives in as the inputbar grows (the "zoom into the input"), then
+        // pulls back once the screen is fully established. Once the cards
+        // are fully in, drop the phone entirely so its huge 18x bounds can't
+        // bleed into the next section — the cards float over the dark page
+        // background from here on (same color as the inputbar).
+        t.to(camera, { scale: 1.55, y: -travelY, duration: 0.18, ease: "power2.in" }, 0.95)
+          .to(camera, { scale: 1, y: 0, duration: 0.22, ease: "power2.inOut" }, 1.13)
+          .set(box.parentElement, { opacity: 0 }, galleryFadeEnd + 0.05);
+      } else {
+        // Light mode: the black closes in as the dive completes, so the screen
+        // is fully dark before the camera pull-back and box reset — the phone
+        // can never reappear.
+        t.to(blackTransition, {
           opacity: 1,
           top: "0%",
           left: "0%",
@@ -436,19 +562,22 @@ export function useWhatsappStory({
           duration: 0.2,
           ease: "power3.in",
         }, 0.95)
-        // Camera pulls back behind the opaque black (ends at 1.17), THEN the
-        // box is hidden/reset and the gallery fades in at camera scale 1 — so
-        // the cards never appear zoomed.
-        .to(camera, { scale: 1, y: 0, duration: 0.2, ease: "power2.out" }, 0.97)
-        .set(box, { opacity: 0, zIndex: 2 }, 1.17)
-        // Hide the parent too: the phone shadow is a pseudo-element of
-        // .story-visual-box, so it would otherwise stay visible at the top of
-        // the viewport while the camera scrolls away into the next section.
-        .set(box.parentElement, { opacity: 0 }, 1.17)
-        .to(backwhole, { opacity: 1, scale: 1, duration: 0.22, ease: "power2.out" }, 1.17)
-        // Fade the gallery with the backwhole (scrubbed together) so the cards
-        // never pop on/off or float over the scene while scrolling back.
-        .to(gallery, { autoAlpha: 1, duration: 0.22, ease: "power2.out" }, 1.17);
+          // Camera pulls back behind the opaque black (ends at 1.17), THEN the
+          // box is hidden/reset and the gallery fades in at camera scale 1 — so
+          // the cards never appear zoomed.
+          .to(camera, { scale: 1, y: 0, duration: 0.2, ease: "power2.out" }, 0.97)
+          .set(box, { opacity: 0, zIndex: 2 }, 1.17)
+          // Hide the parent too: the phone shadow is a pseudo-element of
+          // .story-visual-box, so it would otherwise stay visible at the top of
+          // the viewport while the camera scrolls away into the next section.
+          .set(box.parentElement, { opacity: 0 }, 1.17)
+          // The gallery screen grows from a small rounded rectangle to fill the
+          // viewport; as it reaches full screen the corners straighten out so
+          // the full-bleed backdrop has sharp edges (no dark corner gaps).
+          .to(backwhole, { opacity: 1, duration: 0.06, ease: "power1.out" }, 1.17)
+          .to(backwhole, { scale: 1, duration: 0.22, ease: "power2.inOut" }, 1.17)
+          .to(backwhole, { borderRadius: "0px", duration: 0.09, ease: "power1.in" }, 1.30);
+      }
 
       // Human-like typing: variable speed with a short pause after punctuation.
       const typeSchedule = (el: HTMLDivElement, text: string, startAt: number) => {
@@ -516,9 +645,10 @@ export function useWhatsappStory({
 
       // The hero's atmospheric glow drifts with the scroll (see AtmosphereBackground),
       // so the backwhole glow does the same here — it keeps moving as the
-      // camera scrubs through the pinned sequence.
+      // camera scrubs through the pinned sequence. Dark mode skips it: the
+      // backwhole never appears there (the inputbar is the screen).
       const glow = backwhole.querySelector<HTMLElement>(".story-bg-glow");
-      if (glow) {
+      if (glow && !isDark) {
         glowAnim = gsap.to(glow, {
           y: 340,
           x: -120,
@@ -534,7 +664,10 @@ export function useWhatsappStory({
         });
       }
 
-      if (galleryLoaded && Number(gsap.getProperty(backwhole, "opacity")) > 0.01) {
+      // The gallery is active exactly while it is visible (its opacity is driven
+      // by the scrubbed timeline), so a rebuild mid-scroll resumes it in sync.
+      const backdropVisible = Number(gsap.getProperty(gallery, "opacity")) > 0.01;
+      if (galleryLoaded && backdropVisible) {
         startGalleryIfReady();
       }
     };
@@ -571,7 +704,8 @@ export function useWhatsappStory({
     };
     // Refs are stable and `bubbles`/`products` are recreated arrays of those
     // same refs; rebuilding on every render would thrash the timeline. Only
-    // the reduced preference and headline copy (locale) should re-trigger it.
+    // the reduced preference, headline copy (locale), and theme should
+    // re-trigger it.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduced, headline1, headline2]);
+  }, [reduced, headline1, headline2, theme]);
 }

@@ -111,26 +111,35 @@ const DollyGallery = forwardRef<HTMLDivElement, DollyGalleryProps>(function Doll
     const start = () => {
       if (running) return;
       running = true;
-      // Visibility/opacity is driven by the story timeline (scrubbed with the
-      // backwhole) so the cards fade in/out together with the backdrop instead
-      // of popping on/off at a threshold.
-      moveTimeline.pause(0);
+      // Resume from the current progress — never reset to 0. Resetting here
+      // made the cards restart from the beginning on re-entry (e.g. after a
+      // reverse scroll past the gallery), which felt like a jump instead of a
+      // smooth resume. The next progress event drives the timeline to the
+      // scroll-matched position.
     };
     const updateProgress = (event: Event) => {
       const progress = (event as CustomEvent<{ progress: number }>).detail.progress;
       if (!running) return;
+      const target = Math.max(0, Math.min(1, progress));
+      const current = moveTimeline.progress();
+      // Forward keeps the long, weighted glide (the intended feel). Reverse
+      // tracks the scroll closely so the cards retrace their exact states
+      // instead of lagging behind and being cut off mid-reverse.
+      const duration = target < current ? 0.4 : Math.max(1.1, smooth * 1.6);
       gsap.to(moveTimeline, {
-        progress: Math.max(0, Math.min(1, progress)),
-        duration: Math.max(1.1, smooth * 1.6),
+        progress: target,
+        duration,
         ease: "power1.out",
         overwrite: true,
       });
     };
     const stop = () => {
-      if (!running && moveTimeline.time() === 0) return;
+      if (!running) return;
       running = false;
-      moveTimeline.pause(0);
-      gsap.set(root, { autoAlpha: 0 });
+      // Leave the timeline where it is. Visibility is driven by the story
+      // timeline (the scrubbed autoAlpha fade), and resetting to 0 here made
+      // the cards jump to their initial state on reverse scroll while the
+      // gallery was still on screen.
     };
 
     root.addEventListener("dolly-gallery:start", start);

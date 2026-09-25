@@ -1,6 +1,6 @@
 {
   "nav.services": "Serviços",
-  "nav.work": "Trabalhos",
+  "nav.work": "Projetos",
   "nav.about": "Sobre",
   "nav.contact": "Contato",
   "nav.cta": "Iniciar projeto",
@@ -132,7 +132,7 @@
   "ambition.p1": "Construir uma empresa de tecnologia que ajude negócios a evoluir continuamente. Unimos engenharia, inteligência artificial, automação, design e crescimento digital para transformar necessidades reais em soluções que geram valor. Não acreditamos em transformação como um projeto com ponto final. Acreditamos em construir, medir, aprender e evoluir continuamente.",
   "ambition.p2": "Medimos impacto, não apenas entregas. Cada projeto avança em etapas claras, com decisões orientadas por dados, contexto e experiência prática.",
 
-  "work.eyebrow": "TRABALHOS",
+  "work.eyebrow": "PROJETOS",
   "work.title": "Não falamos sobre transformação digital. <em>Nós a construímos.</em>",
   "work.cta": "Ver projeto",
   "work.tagWebsiteLeads": "Website & Geração de Leads",

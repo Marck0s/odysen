@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { useTheme } from "@/lib/theme/ThemeProvider";
 import { useWhatsappStory, type BubbleConfig } from "@/hooks/useWhatsappStory";
 import DollyGallery from "@/components/ui/DollyGallery";
 import {
@@ -17,6 +18,7 @@ import {
  */
 export default function Story() {
   const { t } = useLanguage();
+  const { theme } = useTheme();
 
   const sectionRef = useRef<HTMLElement>(null);
   const captionRef = useRef<HTMLDivElement>(null);
@@ -72,6 +74,7 @@ export default function Story() {
     products: [p1, p2, p3, p4],
     headline1: t("story.headline1"),
     headline2: t("story.headline2"),
+    theme,
   });
 
   return (

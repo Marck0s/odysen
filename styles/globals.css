@@ -601,7 +601,10 @@ footer .footer-brand-desc {
   z-index: 7;
   opacity: 0;
   transform-origin: 50% 50%;
-  will-change: transform, opacity;
+  will-change: transform, opacity, border-radius;
+  /* Rounded "screen" that grows from a small rectangle to fill the viewport;
+     the corners straighten out as it reaches full screen. */
+  border-radius: 32px;
 }
 .story-backwhole .story-bg-glow {
   position: absolute;
