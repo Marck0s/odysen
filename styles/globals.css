@@ -689,7 +689,12 @@ footer .footer-brand-desc {
    rim), offset to the right and below as if the light comes from the left.
    Because the offset pushes the shadow right/down, its left/top portions stay
    hidden behind the device — the shadow only reads on the right side and
-   underneath the phone. */
+   underneath the phone.
+   A native box-shadow is used instead of filter: blur() because a blurred
+   pseudo-element is rasterized into an offscreen buffer whose rectangular
+   edge can become visible on mobile GPUs (a "square mold" around the shadow),
+   especially on first paint. box-shadow is composited directly and follows the
+   rounded cutout, so it can never show that buffer edge. */
 .story-visual-box::after {
   content: "";
   position: absolute;
@@ -700,9 +705,8 @@ footer .footer-brand-desc {
   top: 2.0%;
   bottom: 1.9%;
   border-radius: 72px;
-  background: var(--phone-shadow);
-  filter: blur(16px);
-  transform: translate(16%, 12%);
+  background: transparent;
+  box-shadow: 56px 92px 48px -8px var(--phone-shadow);
   z-index: -1;
   pointer-events: none;
 }
@@ -2032,8 +2036,7 @@ footer .social[data-tooltip]:hover::before {
   }
   .story-visual-box::after {
     border-radius: 32px;
-    filter: blur(10px);
-    transform: translate(14%, 10%);
+    box-shadow: 28px 42px 28px -6px var(--phone-shadow);
   }
   .story-dolly-gallery {
     display: none;
