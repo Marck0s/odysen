@@ -255,13 +255,18 @@ header.nav.scrolled {
   position: relative;
 }
 
+.menu-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
 .mobile-menu {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
   display: flex;
   flex-direction: column;
-  min-width: 180px;
+  min-width: 200px;
   padding: 10px 14px;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -292,6 +297,46 @@ header.nav.scrolled {
   padding: 12px 8px 6px;
   margin-top: 8px;
   border-top: 1px solid var(--border);
+}
+
+/* AI summary block (mobile menu): the Footer's AI row, reduced to sub-links. */
+.mobile-menu .mobile-ai {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 10px;
+  margin-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.mobile-menu .mobile-ai-label {
+  padding: 8px 8px 6px;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.mobile-menu .mobile-ai-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 8px;
+  color: var(--muted);
+  font-size: 13px;
+  /* The generic `.mobile-menu a` rule uppercases and tracks out the nav
+     labels; model names keep their brand casing, like the Footer's AI row. */
+  letter-spacing: 0.02em;
+  text-transform: none;
+  border-radius: 8px;
+  transition: color var(--dur-s) var(--ease), background-color var(--dur-s) var(--ease);
+}
+.mobile-menu .mobile-ai-link:hover {
+  color: var(--fg);
+  background: var(--hover-bg);
+}
+.mobile-menu .mobile-ai-link .ai-icon {
+  flex: none;
+  color: var(--purple-light);
 }
 
 header.nav .logo,
