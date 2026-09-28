@@ -1310,9 +1310,14 @@ footer .footer-brand-desc {
   margin: 10px 0 20px;
   min-height: 36px;
 }
+/* The plan "price" slot no longer shows values — it invites a quote, so it
+   renders as a compact CTA label instead of a large price figure. */
 .plan .plan-price {
   font-family: "Space Grotesk", sans-serif;
-  font-size: 30px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--purple-light);
   margin-bottom: 22px;
 }
 .plan ul {
