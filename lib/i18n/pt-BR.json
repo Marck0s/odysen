@@ -58,6 +58,7 @@
   "svc.web.p3name": "ENTERPRISE",
   "svc.web.p3desc": "Para empresas que exigem soluções digitais sob medida.",
   "svc.web.p3price": "Faça um orçamento",
+  "svc.web.plansSubject": "Websites",
 
   "svc.bot.idx": "02",
   "svc.bot.title": "Chatbots<br/>Inteligentes",
@@ -77,6 +78,7 @@
   "svc.bot.p3name": "AUTOMAÇÃO TOTAL",
   "svc.bot.p3desc": "Para operações que precisam de automação de ponta a ponta.",
   "svc.bot.p3price": "Faça um orçamento",
+  "svc.bot.plansSubject": "Chatbots e IA",
 
   "svc.ads.idx": "03",
   "svc.ads.title": "Tráfego<br/>Pago",
@@ -96,6 +98,7 @@
   "svc.ads.p3name": "SCALE",
   "svc.ads.p3desc": "Para operações com investimento relevante em mídia.",
   "svc.ads.p3price": "Faça um orçamento",
+  "svc.ads.plansSubject": "Tráfego pago",
 
   "svc.mkt.idx": "04",
   "svc.mkt.title": "Marketing",
@@ -115,6 +118,11 @@
   "svc.mkt.p3name": "FULL SCALE",
   "svc.mkt.p3desc": "Marketing como sistema, não como ação isolada.",
   "svc.mkt.p3price": "Faça um orçamento",
+  "svc.mkt.plansSubject": "Marketing",
+
+  "svc.plans.show": "Soluções para",
+  "svc.plans.hide": "Ocultar soluções",
+  "svc.plans.count": "3 planos",
 
   "plan.recommended": "Recomendado",
   "plan.cta.start": "Começar",

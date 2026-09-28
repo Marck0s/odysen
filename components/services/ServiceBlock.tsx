@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useTextReveal } from "@/hooks/useTextReveal";
+import { usePlansReveal } from "@/hooks/usePlansReveal";
 import PlanCard from "./PlanCard";
 import { PLAN_FEATURES } from "@/lib/data/services";
 import type { ServiceDef } from "@/lib/data/services";
@@ -16,14 +17,21 @@ interface ServiceBlockProps {
 export default function ServiceBlock({ service }: ServiceBlockProps) {
   const { t, locale } = useLanguage();
   const headRef = useRef<HTMLHeadingElement>(null);
-  const plansRef = useRef<HTMLDivElement>(null);
   const [activePlan, setActivePlan] = useState(0);
+  // Each ServiceBlock owns its own hook instance, so the four services
+  // collapse independently by construction rather than through shared state.
+  const { open, toggle, panelRef, innerRef, plansRef, dotsRef } = usePlansReveal();
   useTextReveal(headRef as React.RefObject<HTMLElement>);
 
   const p = service.i18nPrefix;
   const features = PLAN_FEATURES[service.id];
   const loc: Locale = locale;
   const carouselLabel = locale === "pt-BR" ? "Planos" : "Plans";
+  // Composed rather than interpolated: the dictionaries are flat key/value
+  // maps with no interpolation, and the subject differs per service.
+  const showLabel = open
+    ? t("svc.plans.hide")
+    : `${t("svc.plans.show")} ${t(`${p}.plansSubject`)}`;
 
   /** Active slide = the card whose center is closest to the container's
    *  center. Robust to the 28px padding, the 14px gap and any card width. */
@@ -45,7 +53,10 @@ export default function ServiceBlock({ service }: ServiceBlockProps) {
       }
     }
     setActivePlan((prev) => (prev === next ? prev : next));
-  }, []);
+    // plansRef is a ref: its identity is stable for the block's lifetime, so
+    // listing it keeps the callback stable (and the linter honest now that the
+    // ref comes from a hook instead of a local useRef).
+  }, [plansRef]);
 
   // Recompute on mount (browsers may restore scroll position on reload) and
   // on resize (mobile <-> desktop switches reset scrollLeft to 0).
@@ -92,40 +103,69 @@ export default function ServiceBlock({ service }: ServiceBlockProps) {
           ))}
         </div>
 
-        <div
-          className="plans"
-          ref={plansRef}
-          onScroll={handlePlansScroll}
-          tabIndex={0}
-          role="region"
-          aria-label={carouselLabel}
-          id={`plans-${service.id}`}
+        <button
+          type="button"
+          className="plans-toggle"
+          aria-expanded={open}
+          aria-controls={`plans-${service.id}`}
+          onClick={toggle}
         >
-          {[0, 1, 2].map((i) => (
-            <PlanCard
-              key={i}
-              name={t(`${p}.p${i + 1}name`)}
-              desc={t(`${p}.p${i + 1}desc`)}
-              price={t(`${p}.p${i + 1}price`)}
-              features={features[i][loc]}
-              recommended={i === 1}
-              ctaLabel={i === 2 ? t("plan.cta.talk") : t("plan.cta.start")}
-              ctaHref={i === 2 ? whatsappLink() : "#contato"}
-            />
-          ))}
-        </div>
+          <span className="plans-toggle-label">{showLabel}</span>
+          <span className="plans-toggle-aside">
+            {/* Supplementary, not part of the action: kept out of the accessible
+                name so the button still announces as "Soluções para Websites". */}
+            <span className="plans-toggle-meta" aria-hidden="true">
+              {t("svc.plans.count")}
+            </span>
+            <svg
+              className="plans-toggle-arrow"
+              viewBox="0 0 18 18"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M4 7l5 5 5-5" />
+            </svg>
+          </span>
+        </button>
 
-        <div className="plans-dots" role="group" aria-label={carouselLabel}>
-          {[0, 1, 2].map((i) => (
-            <button
-              key={i}
-              type="button"
-              aria-label={t(`${p}.p${i + 1}name`)}
-              aria-current={activePlan === i ? "true" : undefined}
-              aria-controls={`plans-${service.id}`}
-              onClick={() => scrollToPlan(i)}
-            />
-          ))}
+        <div className="plans-reveal" ref={panelRef}>
+          <div className="plans-reveal-inner" ref={innerRef}>
+            <div
+              className="plans"
+              ref={plansRef}
+              onScroll={handlePlansScroll}
+              tabIndex={0}
+              role="region"
+              aria-label={carouselLabel}
+              id={`plans-${service.id}`}
+            >
+              {[0, 1, 2].map((i) => (
+                <PlanCard
+                  key={i}
+                  name={t(`${p}.p${i + 1}name`)}
+                  desc={t(`${p}.p${i + 1}desc`)}
+                  price={t(`${p}.p${i + 1}price`)}
+                  features={features[i][loc]}
+                  recommended={i === 1}
+                  ctaLabel={i === 2 ? t("plan.cta.talk") : t("plan.cta.start")}
+                  ctaHref={i === 2 ? whatsappLink() : "#contato"}
+                />
+              ))}
+            </div>
+
+            <div className="plans-dots" role="group" aria-label={carouselLabel} ref={dotsRef}>
+              {[0, 1, 2].map((i) => (
+                <button
+                  key={i}
+                  type="button"
+                  aria-label={t(`${p}.p${i + 1}name`)}
+                  aria-current={activePlan === i ? "true" : undefined}
+                  aria-controls={`plans-${service.id}`}
+                  onClick={() => scrollToPlan(i)}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -1290,7 +1290,9 @@ footer .footer-brand-desc {
   grid-template-columns: repeat(3, 1fr);
   gap: 26px;
   margin-top: 20px;
-  margin-bottom: 70px;
+  /* 70px left a dead gap above the collapsed plans rail; the rail's own
+     hairline supplies the separation instead. */
+  margin-bottom: 48px;
 }
 .benefit {
   padding: 22px 0;
@@ -1310,6 +1312,151 @@ footer .footer-brand-desc {
 .benefit p {
   font-size: 13.5px;
   color: var(--muted);
+}
+
+/* Trigger: a plate in the same family as the .plan cards — same radius, same
+   surface, same border token — so it reads as an object you can act on rather
+   than a caption. The label is set in the display face (the h1..h4 register)
+   instead of the 12px uppercase micro-label used for eyebrows and benefit
+   numbers: that register change is what stops it disappearing into the
+   metadata. A hairline rail was tried first and read as a fourth .benefit
+   border, not as a control. */
+.plans-toggle {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  min-height: 64px;
+  padding: 18px 24px;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  background: var(--card-bg);
+  color: var(--fg);
+  font-family: var(--font-inter), "Inter", sans-serif;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur-s) var(--ease),
+    border-color var(--dur-s) var(--ease);
+}
+.plans-toggle:hover {
+  background: var(--surface-hover);
+  border-color: var(--control-border-hover);
+}
+/* Open state turns the border purple: the plate is now the group the cards
+   below belong to. */
+.plans-toggle[aria-expanded="true"] {
+  border-color: var(--plan-hover-border);
+}
+.plans-toggle:focus-visible {
+  outline-offset: 3px;
+}
+.plans-toggle-label {
+  font-family: var(--font-space-grotesk), "Space Grotesk", sans-serif;
+  font-size: clamp(17px, 2.2vw, 22px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  text-transform: none;
+  transition: color var(--dur-s) var(--ease);
+}
+.plans-toggle[aria-expanded="true"] .plans-toggle-label {
+  color: var(--purple-light);
+}
+/* Right-hand cluster: what is behind the click, then the arrow. */
+.plans-toggle-aside {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.plans-toggle-meta {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+  transition: color var(--dur-s) var(--ease);
+}
+.plans-toggle:hover .plans-toggle-meta {
+  color: var(--fg);
+}
+/* Arrow rotation is CSS-only (compositor-cheap, and the global
+   prefers-reduced-motion rule already zeroes transition-duration). Purple at
+   rest, because it is the site's action colour — grey gave the only clickable
+   thing in the band no reason to be clicked. */
+.plans-toggle-arrow {
+  display: block;
+  width: 18px;
+  height: 18px;
+  color: var(--purple-light);
+  transition: transform var(--dur-s) var(--ease);
+}
+.plans-toggle-arrow path {
+  stroke: currentColor;
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.plans-toggle[aria-expanded="true"] .plans-toggle-arrow {
+  transform: rotate(180deg);
+}
+
+/* Height-animated shell: clipping only. The end states live here, not in JS —
+   `height: 0` IS the collapsed default, so the prerendered HTML paints
+   collapsed with no script and no inline style. `usePlansReveal` only writes an
+   inline height *between* those two states and hands the resting height back to
+   this rule on every settle, which is what lets a locale switch, a theme swap
+   or a late font load reflow instead of clip. It also drives opacity/y on
+   `.plans-reveal-inner` and opacity on each `.plan` — the cards' transform is
+   left entirely to the tilt, which is why nothing here touches transform. */
+.plans-reveal {
+  overflow: hidden;
+  height: 0;
+}
+/* The attribute is hook-owned and flipped only when a tween settles. React must
+   never render it: it would flip on click, while the inline height is still the
+   authoritative value mid-tween. Attribute (0,2,0) still loses to the inline
+   style, so the tween is never fought.
+
+   Presence selector, NOT [data-open="true"]: the hook calls
+   `toggleAttribute("data-open", next)`, and per the DOM spec that sets the
+   attribute's value to the EMPTY STRING — so the markup is `data-open=""`, which
+   a value selector would not match. Matching on presence keeps the flag honest
+   for both `true` and `""`. Do not "tidy" this into a value selector. */
+.plans-reveal[data-open] {
+  height: auto;
+}
+/* Static top padding clears the .rec-badge 11px overhang and spaces the cards
+   from the trigger plate. Lives on the inner element so the shell can be
+   animated to height 0. Tightened from 40px when the trigger became a plate:
+   the plate's own 18px padding now supplies most of the separation. */
+.plans-reveal-inner {
+  padding-top: 32px;
+}
+@media (max-width: 767px) {
+  /* The mobile carousel already adds 16px of its own top padding. */
+  .plans-reveal-inner {
+    padding-top: 20px;
+  }
+  /* The trigger plate tightens on phones so the label keeps a single line. */
+  .plans-toggle {
+    padding: 16px 20px;
+    gap: 14px;
+  }
+  .plans-toggle-aside {
+    gap: 14px;
+  }
+}
+/* Below this the label plus the count no longer fit on one line, and a
+   two-line label makes the plate look accidental. The count is the
+   supplementary half of the pair, so it goes first. */
+@media (max-width: 560px) {
+  .plans-toggle-meta {
+    display: none;
+  }
 }
 
 .plans {
