@@ -28,24 +28,6 @@ interface UseWhatsappStoryArgs {
   theme: "light" | "dark";
 }
 
-/**
- * Tinker-style pinned phone with a live conversation:
- * - Desktop: ONE initial zoom into the upper portion of the phone (focusing the
- *   first message), then the zoom stays CONSTANT while the camera travels
- *   vertically through the conversation as messages and product cards arrive,
- *   and finally dives into the inputbar — where an opaque black "screen"
- *   closes in, occludes the phone, and hands off to a full-bleed backdrop the
- *   gallery cards fade in on — all scrubbed to scroll. The device stays fixed
- *   (sticky) while the page scrolls. This sequence is theme-agnostic: light and
- *   dark run the exact same timeline (in dark the takeover fills are the same
- *   #07060b as the page, so the purple glow is the only visible cue).
- * - Mobile: no pinned/scroll-locked sequence. The phone shows the full
- *   conversation statically in the normal flow and, on a looping timeline, it
- *   fades away while the odysen-banners cards replace each other one by one in
- *   the same slot; then the phone returns and the cycle repeats. The loop
- *   plays while the section is on screen.
- * Falls back to a fully-visible static state when reduced motion is on.
- */
 export function useWhatsappStory({
   sectionRef,
   chatListRef,
@@ -195,7 +177,6 @@ export function useWhatsappStory({
       if (caret) gsap.set(caret, { visibility: "visible" });
 
       // Desktop camera choreography (the mobile branch ignores these values).
-      // Tinker-style: ONE initial zoom into the upper portion of the phone,
       // then the zoom stays CONSTANT while the camera travels vertically
       // through the phone as the user scrolls. The phone is centered in the
       // 100vh camera; at CAMERA_ZOOM with the transform-origin at 50% 18% the
@@ -469,7 +450,6 @@ export function useWhatsappStory({
         t.to(storyFx, { opacity: 1, duration: 0.38, ease: "power2.out" }, 0.1);
       }
 
-      // Camera choreography (Tinker-style): ONE initial zoom into the upper
       // portion of the phone (0.00–0.16), then the zoom stays CONSTANT while
       // the camera travels vertically through the phone (0.16–0.90) as the
       // conversation descends toward the inputbar — the climax. The dive into
