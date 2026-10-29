@@ -4,7 +4,7 @@
  * import them from here instead.
  */
 
-export const WHATSAPP_NUMBER = "5511963806166";
+export const WHATSAPP_NUMBER = "5511941136837";
 
 export const whatsappLink = (message?: string) => {
   const base = `https://wa.me/${WHATSAPP_NUMBER}`;
